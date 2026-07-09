@@ -35,7 +35,7 @@ Source spec: `docs/initial-prompt.md`.
 | Concern | Choice | Why |
 |---|---|---|
 | Ruby | 3.4.7 via rbenv | Per spec. `.ruby-version` + hardcoded in `Gemfile`. |
-| Rails | 8.x | Ships with Solid Queue/Solid Cache built-in, matching the spec's Postgres-backed cache/job requirement natively. |
+| Rails | 8.0 (latest 8.0.x patch at `rails new` time, pinned exactly in `Gemfile` like Ruby) | Ships with Solid Queue/Solid Cache built-in, matching the spec's Postgres-backed cache/job requirement natively. |
 | DB | PostgreSQL, single schema, dev/test/production databases | Per spec. |
 | Cache | Solid Cache (Postgres-backed) | Per spec, Rails 8 default. |
 | Jobs | Solid Queue (Postgres-backed), `bin/jobs` runner, STDOUT logging | Per spec. |
@@ -52,12 +52,17 @@ Source spec: `docs/initial-prompt.md`.
 - Dedicated `HealthController#show`, mounted at `GET /health`.
 - Checks, in order:
   1. DB connection (`ActiveRecord::Base.connection.active?` / a trivial query).
-  2. Solid Queue reachability (its tables live in the primary DB; a simple
-     count query against a Solid Queue table confirms reachability).
-  3. Solid Cache reachability (write+read a throwaway key, or a simple query
-     against its table).
-- Returns `200 OK` with a small JSON body (`{ status: "ok", checks: {...} }`)
-  only if all three pass.
+  2. Solid Queue reachability: confirm the `solid_queue_processes` table has
+     at least one registered supervisor/worker row — this proves a worker
+     process is actually running, not just that the schema is migrated
+     (which check 1 already covers).
+  3. Solid Cache reachability: write then read back a throwaway key via
+     `Rails.cache.write`/`Rails.cache.read` — proves the cache store round-trips,
+     not just that its table exists.
+- Returns `200 OK` with a JSON body shaped as
+  `{ "status": "ok", "checks": { "database": "ok", "queue": "ok", "cache": "ok" } }`
+  only if all three pass. These three check keys (`database`, `queue`, `cache`)
+  are the fixed contract the request spec asserts against.
 - Returns `503 Service Unavailable` with per-check status if any fail.
 - No authentication required (used by external uptime monitors / load
   balancers).
@@ -76,8 +81,9 @@ example, extended with a Vite pane.
 
 **`./serve`** (production):
 - Loads `.env`.
-- Runs `bin/vite build` (or `rails assets:precompile`, whichever `vite_rails`
-  wires up) before starting anything.
+- Runs `bin/rails assets:precompile` before starting anything (this invokes
+  `vite_rails`'s build step as part of the standard Rails asset pipeline
+  hook — the single command to run, not an either/or).
 - tmux session, 2 panes:
   1. Puma server (`bin/rails s` in production mode, or `bin/puma`)
   2. `RAILS_LOG_TO_STDOUT=1 bin/jobs` (Solid Queue worker)
@@ -119,3 +125,8 @@ preview service, if needed) add more panes.
   also generated) — implementation plan should confirm whether Kamal
   scaffolding is skipped at `rails new` time via `--skip-kamal` and whether
   `--skip-docker` is a valid generator flag for the Rails version in use.
+- Rails 8 defaults to Propshaft (not Sprockets) for the asset pipeline.
+  `vite_rails`/`vite_ruby` integration with Propshaft is generally supported
+  but has had rough edges historically (asset path resolution, manifest
+  lookup). The implementation plan should verify the `vite_rails` version in
+  use documents Propshaft compatibility before wiring up `assets:precompile`.
