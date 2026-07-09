@@ -38,6 +38,7 @@ rails _8.0.5_ new . \
   --database=postgresql \
   --skip-test \
   --skip-hotwire \
+  --skip-javascript \
   --skip-jbuilder \
   --skip-docker \
   --skip-kamal \
@@ -46,6 +47,8 @@ rails _8.0.5_ new . \
   --force
 ```
 
+`--skip-javascript` skips `importmap-rails` and `app/javascript/` — this app's JS pipeline is entirely `vite_rails`/Inertia, installed in Chunk 6, so importmap would otherwise sit unused as dead config.
+
 `--force` is required because `docs/`, `project/`, `.gitignore`, `.git/` already exist in this directory; Rails will prompt to overwrite `.gitignore` — confirm it merges rather than blows away the `project/` ignore rule (verify in Step 6).
 
 Expected: generator runs `bundle install` and `git init` (git init will no-op, already a repo) and finishes without error.
@@ -53,7 +56,9 @@ Expected: generator runs `bundle install` and `git init` (git init will no-op, a
 - [ ] **Step 4: Verify Docker/Kamal/Hotwire artifacts are absent**
 
 Run: `ls Dockerfile .dockerignore config/deploy.yml bin/docker-entrypoint bin/dev app/javascript/controllers 2>&1`
-Expected: `No such file or directory` for all of them. If any exist, delete them:
+Expected: `Dockerfile`, `.dockerignore`, `config/deploy.yml`, `bin/docker-entrypoint`, `app/javascript/controllers` should all be `No such file or directory`. `bin/dev` is scaffolded by Rails 8 regardless of the flags above (it's a generic dev-server launcher script, not Docker/Hotwire-specific) — it will exist; that's expected and fine to leave, since it's harmless and unused once `./serve-dev` exists.
+
+If any of the Docker/Kamal files unexpectedly exist, delete them:
 `rm -f Dockerfile .dockerignore config/deploy.yml bin/docker-entrypoint`
 
 - [ ] **Step 5: Verify `solid_cable` was not pulled in despite `--skip-action-cable`**
@@ -209,6 +214,15 @@ production:
   password: <%= ENV["COMUNIDAD_ANTESIS_DATABASE_PASSWORD"] %>
 ```
 
+Add the new production credential to `.env.example` (created in Chunk 2) so it's documented alongside `RAILS_PORT`:
+
+```
+RAILS_PORT=3000
+COMUNIDAD_ANTESIS_DATABASE_PASSWORD=
+```
+
+Update the local `.env` too (`COMUNIDAD_ANTESIS_DATABASE_PASSWORD=` — left blank in development, since the dev/test blocks above don't reference it).
+
 - [ ] **Step 3: Move Solid Queue/Cache migrations into the primary migration path**
 
 Run: `find db -type d`
@@ -222,9 +236,11 @@ rmdir db/queue_migrate db/cache_migrate 2>/dev/null
 
 - [ ] **Step 4: Point Solid Queue config at the primary database connection**
 
-Edit `config/solid_queue.yml` (or the `config.solid_queue` block if inline) — remove any `connects_to`/separate-database directive so Solid Queue uses `ActiveRecord::Base` (the primary connection) instead of a named `queue` connection. If the generator created `app/models/solid_queue_record.rb` or similar with `connects_to database: { writing: :queue }`, delete that override so it falls back to the primary connection.
+`config/solid_queue.yml` (if present) configures worker/dispatcher process topology (polling interval, thread counts) — it does NOT control which database Solid Queue writes to. The actual database routing directive is `config.solid_queue.connects_to = { database: { writing: :queue } }`, set inline in `config/environments/development.rb` and `config/environments/production.rb` (Rails 8's default multi-db generator adds this line to both). Find and delete that line in both files so Solid Queue falls back to the primary connection (`ActiveRecord::Base`) instead of a named `:queue` connection.
 
-Run: `grep -rn "connects_to" config/ app/models/ 2>/dev/null`
+Also check `app/models/application_record.rb` and any `app/models/solid_queue_record.rb`/`solid_cache_record.rb` the generator may have created — if either defines `connects_to database: { writing: :queue }` or `:cache`, delete that override.
+
+Run: `grep -rn "connects_to" config/environments/ app/models/ 2>/dev/null`
 Expected: no results referencing `:queue` or `:cache` after edits.
 
 - [ ] **Step 5: Point Solid Cache config at the primary database connection**
@@ -237,7 +253,20 @@ In each of `config/environments/development.rb` and `config/environments/product
 config.cache_store = :solid_cache_store
 ```
 
-- [ ] **Step 6: Regenerate schema against the unified database**
+- [ ] **Step 6: Drop the orphaned per-database Postgres databases**
+
+Chunk 1 Step 10 ran `bin/rails db:create` against the original multi-database `config/database.yml`, which created `comunidad_antesis_development_cache` and `comunidad_antesis_development_queue` (and their `_test` equivalents) as real Postgres databases. Now that `database.yml` no longer references them, `bin/rails db:drop` won't clean them up. Drop them directly:
+
+```bash
+psql -U "$(whoami)" -c "DROP DATABASE IF EXISTS comunidad_antesis_development_cache;"
+psql -U "$(whoami)" -c "DROP DATABASE IF EXISTS comunidad_antesis_development_queue;"
+psql -U "$(whoami)" -c "DROP DATABASE IF EXISTS comunidad_antesis_test_cache;"
+psql -U "$(whoami)" -c "DROP DATABASE IF EXISTS comunidad_antesis_test_queue;"
+```
+
+Expected: each returns `DROP DATABASE` (or silently no-ops if a given name doesn't exist).
+
+- [ ] **Step 7: Regenerate schema against the unified database**
 
 ```bash
 bin/rails db:drop db:create db:migrate
@@ -245,17 +274,17 @@ bin/rails db:drop db:create db:migrate
 
 Expected: no errors; `db/schema.rb` (or `db/structure.sql`, whichever Rails 8 defaults to) now contains `solid_queue_*` and `solid_cache_entries` tables alongside any app tables, all in one file.
 
-- [ ] **Step 7: Verify unified schema**
+- [ ] **Step 8: Verify unified schema**
 
 Run: `grep -c "create_table \"solid_queue" db/schema.rb` and `grep -c "create_table \"solid_cache" db/schema.rb`
 Expected: both > 0, confirming the tables live in the single `db/schema.rb`.
 
-- [ ] **Step 8: Boot the app and confirm Solid Queue/Cache initialize without error**
+- [ ] **Step 9: Boot the app and confirm Solid Queue/Cache initialize without error**
 
 Run: `bin/rails runner "puts Rails.cache.class; puts SolidQueue::Job.count"`
 Expected: prints `SolidCache::Store` (or similar) then `0`, no exceptions.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add -A
@@ -315,7 +344,9 @@ git commit -m "Install RSpec, replacing Minitest"
 - Modify: `config/routes.rb`
 - Test: `spec/requests/health_spec.rb`
 
-- [ ] **Step 1: Write the failing request spec**
+Each check (database, queue, cache) is driven by its own failing test before its branch of the controller is written, per TDD. `SolidQueue::Process.exists?` needs a real row to return `true` in the healthy-path test — no worker runs during `rspec`, so tests create/remove the row explicitly via a shared helper.
+
+- [ ] **Step 1: Write the failing spec for the database check only**
 
 Create `spec/requests/health_spec.rb`:
 
@@ -323,20 +354,15 @@ Create `spec/requests/health_spec.rb`:
 require "rails_helper"
 
 RSpec.describe "GET /health", type: :request do
-  it "returns 200 with all checks ok when everything is healthy" do
+  it "returns 200 with database ok when the database is reachable" do
     get "/health"
 
     expect(response).to have_http_status(:ok)
     body = JSON.parse(response.body)
-    expect(body["status"]).to eq("ok")
-    expect(body["checks"]).to eq(
-      "database" => "ok",
-      "queue" => "ok",
-      "cache" => "ok"
-    )
+    expect(body["checks"]["database"]).to eq("ok")
   end
 
-  it "returns 503 when the database check fails" do
+  it "returns 503 with database error when the database check fails" do
     allow(ActiveRecord::Base.connection).to receive(:active?).and_raise(
       ActiveRecord::ConnectionNotEstablished, "no connection"
     )
@@ -364,17 +390,78 @@ In `config/routes.rb`, add:
 get "/health", to: "health#show"
 ```
 
-- [ ] **Step 4: Write the minimal `HealthController`**
+- [ ] **Step 4: Write the minimal controller for the database check only**
 
 Create `app/controllers/health_controller.rb`:
 
 ```ruby
 class HealthController < ActionController::Base
   def show
+    checks = { "database" => check_database }
+
+    status = checks.values.all? { |v| v == "ok" } ? :ok : :service_unavailable
+    overall = status == :ok ? "ok" : "error"
+
+    render json: { status: overall, checks: checks }, status: status
+  end
+
+  private
+
+  def check_database
+    ActiveRecord::Base.connection.active? ? "ok" : "error"
+  rescue StandardError
+    "error"
+  end
+end
+```
+
+- [ ] **Step 5: Run the spec, confirm both database examples pass**
+
+Run: `bundle exec rspec spec/requests/health_spec.rb`
+Expected: `2 examples, 0 failures`.
+
+- [ ] **Step 6: Write the failing spec for the queue check**
+
+Add to `spec/requests/health_spec.rb`, inside the existing `RSpec.describe` block:
+
+```ruby
+  it "returns 200 with queue ok when a Solid Queue worker is registered" do
+    SolidQueue::Process.create!(
+      kind: "Worker",
+      pid: Process.pid,
+      hostname: "test-host",
+      last_heartbeat_at: Time.current,
+      name: "test-worker-#{SecureRandom.hex(4)}",
+      metadata: {}
+    )
+
+    get "/health"
+
+    body = JSON.parse(response.body)
+    expect(body["checks"]["queue"]).to eq("ok")
+  end
+
+  it "returns 503 with queue error when no Solid Queue worker is registered" do
+    get "/health"
+
+    expect(response).to have_http_status(:service_unavailable)
+    body = JSON.parse(response.body)
+    expect(body["checks"]["queue"]).to eq("error")
+  end
+```
+
+Run: `bundle exec rspec spec/requests/health_spec.rb`
+Expected: FAIL — `checks["queue"]` is `nil` (key doesn't exist yet) on both new examples.
+
+- [ ] **Step 7: Add the queue check to the controller**
+
+Update `app/controllers/health_controller.rb`:
+
+```ruby
+  def show
     checks = {
       "database" => check_database,
-      "queue" => check_queue,
-      "cache" => check_cache
+      "queue" => check_queue
     }
 
     status = checks.values.all? { |v| v == "ok" } ? :ok : :service_unavailable
@@ -396,7 +483,63 @@ class HealthController < ActionController::Base
   rescue StandardError
     "error"
   end
+```
 
+Per the spec, this confirms a registered Solid Queue worker process exists, not just that the schema is migrated — that's already covered by the database check.
+
+- [ ] **Step 8: Run the spec, confirm all 4 examples pass**
+
+Run: `bundle exec rspec spec/requests/health_spec.rb`
+Expected: `4 examples, 0 failures`.
+
+- [ ] **Step 9: Write the failing spec for the cache check**
+
+Add to `spec/requests/health_spec.rb`:
+
+```ruby
+  it "returns 200 with cache ok when the cache round-trips" do
+    get "/health"
+
+    body = JSON.parse(response.body)
+    expect(body["checks"]["cache"]).to eq("ok")
+  end
+
+  it "returns 503 with cache error when the cache write fails" do
+    allow(Rails.cache).to receive(:write).and_raise(StandardError, "cache unreachable")
+
+    get "/health"
+
+    expect(response).to have_http_status(:service_unavailable)
+    body = JSON.parse(response.body)
+    expect(body["checks"]["cache"]).to eq("error")
+  end
+```
+
+Run: `bundle exec rspec spec/requests/health_spec.rb`
+Expected: FAIL — `checks["cache"]` is `nil` on both new examples.
+
+- [ ] **Step 10: Add the cache check to the controller**
+
+Update `app/controllers/health_controller.rb`:
+
+```ruby
+  def show
+    checks = {
+      "database" => check_database,
+      "queue" => check_queue,
+      "cache" => check_cache
+    }
+
+    status = checks.values.all? { |v| v == "ok" } ? :ok : :service_unavailable
+    overall = status == :ok ? "ok" : "error"
+
+    render json: { status: overall, checks: checks }, status: status
+  end
+```
+
+And add the private method alongside `check_database`/`check_queue`:
+
+```ruby
   def check_cache
     key = "health_check_#{SecureRandom.hex(4)}"
     Rails.cache.write(key, "1", expires_in: 5.seconds)
@@ -404,27 +547,19 @@ class HealthController < ActionController::Base
   rescue StandardError
     "error"
   end
-end
 ```
 
-Per the spec, the queue check confirms a registered Solid Queue worker process exists (`SolidQueue::Process.exists?`), not just that the schema is migrated — that's already covered by the database check.
-
-- [ ] **Step 5: Run the spec again, confirm the healthy-path test passes but the degraded-path test may still fail**
+- [ ] **Step 11: Run the full spec file, confirm all 6 examples pass**
 
 Run: `bundle exec rspec spec/requests/health_spec.rb`
-Expected: first example (healthy path) passes. Second example (database failure) should also pass since the `rescue StandardError` catches the stubbed raise — if it fails, check that `ActiveRecord::ConnectionNotEstablished` is a `StandardError` subclass (it is) and that the stub target matches what the controller calls.
+Expected: `6 examples, 0 failures`.
 
-- [ ] **Step 6: Both tests green**
-
-Run: `bundle exec rspec spec/requests/health_spec.rb`
-Expected: `2 examples, 0 failures`.
-
-- [ ] **Step 7: Manual smoke test**
+- [ ] **Step 12: Manual smoke test**
 
 Run: `bin/rails server -p 3000 &`, then `curl -s http://localhost:3000/health | python3 -m json.tool`, then `kill %1`
-Expected: JSON body with `"status": "ok"` and all three checks `"ok"`.
+Expected: JSON body with `"status": "error"` and `"checks": {"database": "ok", "queue": "error", "cache": "ok"}` — `queue` is expected to show `"error"` here because no Solid Queue worker process is running outside of tests (the `serve-dev`/`serve` scripts in Chunk 8 start one; this manual check is run without them).
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 13: Commit**
 
 ```bash
 git add app/controllers/health_controller.rb config/routes.rb spec/requests/health_spec.rb
@@ -454,7 +589,12 @@ Run: `bundle install`
 
 - [ ] **Step 3: Run the Inertia install generator with React + Vite + Tailwind**
 
-Run: `bin/rails generate inertia:install --framework=react --typescript=false --tailwind`
+First check the generator's actual flag names before running it, since Thor boolean flags don't always take `=false`/`=true` — some are toggled via a `--no-` prefix instead:
+
+Run: `bin/rails generate inertia:install --help`
+Expected: output lists `--framework` and a typescript-related boolean option. Confirm whether disabling it is `--no-typescript` or `--typescript=false` from the actual `--help` output, then use that exact form below.
+
+Run (adjust the typescript flag per the `--help` output above): `bin/rails generate inertia:install --framework=react --no-typescript --tailwind`
 
 Expected: generator adds `vite_rails` to the Gemfile automatically, scaffolds `app/frontend/entrypoints/application.jsx`, `app/frontend/pages/`, `vite.config.ts`, `bin/vite`, and wires Tailwind into the Vite build. If the generator prompts to install npm packages, allow it (it runs `npm install`/`yarn install` depending on what's detected — confirm a `package.json` and lockfile now exist at repo root).
 
