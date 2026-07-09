@@ -52,6 +52,12 @@ decorative botanical elements — flat and minimal.
 
 ### Design tokens (Tailwind theme)
 
+Fonts load via a `<link>` to Google Fonts in the Inertia layout `<head>`
+(`app/views/layouts/*` used by inertia-rails), with `preconnect` hints, so
+both faces are requested as early as possible for the above-the-fold render.
+(`@fontsource` via Vite is an acceptable alternative; the plan should pick one
+and note the FOUT tradeoff.)
+
 Extend `tailwind.config` with the book's palette:
 
 | Token | Hex |
@@ -75,19 +81,39 @@ rendered flat in the right column.
 
 - `GET /` → `LandingController#index`
   - Renders Inertia page `Landing`.
-  - Props: `subscribed` (bool, from flash), `alreadySubscribed` (bool, from
-    flash), and `source` (string, echoed from `params[:source]` so it can be
-    forwarded through the form as a hidden field).
+  - Props: `subscribed` (bool), `alreadySubscribed` (bool), and `source`
+    (string, echoed from `params[:source]` so it can be forwarded through the
+    form as a hidden field).
+  - **Flash → props mechanism (single approach, do not also use
+    `inertia_share`):** `LandingController#index` reads `flash[:subscribed]`
+    and `flash[:already_subscribed]` and passes them as the `subscribed` /
+    `alreadySubscribed` props explicitly. Flash survives the single
+    redirect-to-root used by `create`, so no global shared-data wiring is
+    needed for Phase 2a.
   - Replaces the temporary `WelcomeController#index` / `Welcome` page created
     for the Phase 1 Inertia smoke test — both the controller and the
     `Welcome.jsx` page are deleted.
 - `POST /newsletter_emails` → `NewsletterEmailsController#create`
   - Params: `email`, `source` (optional).
-  - On success: redirect to `/` with flash `subscribed: true`.
-  - On duplicate (email already present): redirect to `/` with flash
-    `alreadySubscribed: true` (no new row, no generic error).
-  - On invalid email (format/blank): re-render with an Inertia validation
-    error on the `email` field (Inertia's standard `errors` prop).
+  - Control flow (the controller must distinguish the three outcomes, not
+    treat all save failures alike):
+    1. Build `NewsletterEmail.new(email:, source:)` and attempt `save`.
+    2. **Success** (`save` returns true): redirect to `/` with
+       `flash[:subscribed] = true`.
+    3. **Duplicate**: detected when `save` returns false and
+       `record.errors.details[:email]` includes `{ error: :taken }`, OR when
+       the DB unique index raises `ActiveRecord::RecordNotUnique` (concurrent
+       insert race — wrap the save in a rescue for this). Both map to a
+       redirect to `/` with `flash[:already_subscribed] = true` (no new row).
+    4. **Invalid** (any other validation failure, e.g. blank/malformed): see
+       the invalid-email path below.
+  - **Invalid-email error path:** inertia-rails does not server-side
+    re-render. Use the redirect-back-with-errors pattern: `redirect_to
+    root_path` with the model's errors surfaced via inertia-rails validation
+    handling (`redirect_to root_path, inertia: { errors: record.errors }`, or
+    equivalently rely on the gem's `inertia_errors` sharing after
+    `redirect_back`). The `Landing` page then reads the standard Inertia
+    `errors.email` prop and shows an inline message under the input.
 
 ## Data model — `NewsletterEmail`
 
@@ -121,9 +147,10 @@ Model behavior:
    - `alreadySubscribed`: inline "Ya estás en la lista" message.
    - validation error: the form with an error message under the input.
 
-Because the controller redirects back to `/` (the Inertia
-redirect-on-success pattern), no full page reload occurs and the flash props
-drive the UI state.
+Because the controller redirects back to `/` in every outcome (the Inertia
+redirect pattern — 303 for the POST), no full page reload occurs; flash props
+drive the success/already-subscribed states and the Inertia `errors` prop
+drives the invalid state.
 
 ## Component / file structure
 
@@ -153,18 +180,27 @@ drive the UI state.
   - `POST /newsletter_emails` with a valid new email creates one row and
     redirects to `/` with `subscribed` flash.
   - `POST` with a duplicate email creates no new row and redirects with
-    `alreadySubscribed` flash.
-  - `POST` with a malformed email creates no row and returns a validation
-    error on `email`.
+    `alreadySubscribed` flash (case-insensitive duplicate, e.g. existing
+    `foo@x.com` + submitted `Foo@x.com`).
+  - `POST` with a malformed email creates no row and surfaces an Inertia
+    `errors.email` error.
   - `source` is persisted when provided.
+  - (Optional, if straightforward to simulate) a `RecordNotUnique` raised at
+    save maps to the `alreadySubscribed` outcome, not a 500.
 
 ## Open questions / risks
 
-- **Inertia flash props:** Inertia doesn't surface Rails flash automatically;
-  the app must share flash via `inertia_share` (in `ApplicationController` or
-  an Inertia initializer). If Phase 1's `inertia:install` didn't set this up,
-  the plan must add a small shared-data block exposing `flash` (or the
-  specific `subscribed`/`alreadySubscribed` keys) to all Inertia responses.
+- **Inertia flash props:** resolved above — `LandingController#index` reads
+  flash and sets the `subscribed`/`alreadySubscribed` props explicitly (no
+  global `inertia_share`). The plan should verify inertia-rails' error sharing
+  (for the invalid-email `errors` prop) is available in the Phase 1 install;
+  if not, enable it (the `inertia_rails` `redirect_to ..., inertia: { errors:
+  }` handling or an `inertia_share` of `inertia_errors`).
+- **Accessibility:** the email input needs an associated label (visible or
+  `aria-label`) and the inline error should be tied to the input via
+  `aria-describedby`; success/already-subscribed messages should be
+  announced (e.g. `role="status"`). Cheap to include; the plan should specify
+  it.
 - **Font fidelity:** Fredoka/Nunito Sans approximate the book; exact match is
   not guaranteed. Acceptable for now, flagged for later refinement.
 - **Cover asset weight:** the extracted cover PNG should be reasonably
