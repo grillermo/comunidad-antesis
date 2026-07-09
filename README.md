@@ -26,7 +26,10 @@ bin/rails db:prepare
 ./serve-dev
 ```
 
-This runs Rails on `http://localhost:${RAILS_PORT:-3000}`, Vite, and Solid Queue.
+Opens a tmux session (`comunidad-antesis`) with three panes: the Rails
+server on `http://localhost:${RAILS_PORT:-3000}`, the Vite dev server (HMR),
+and the Solid Queue worker. Detach with `Ctrl-b d`; stop with
+`tmux kill-session -t comunidad-antesis`.
 
 ## Production-Style Serve
 
@@ -34,7 +37,10 @@ This runs Rails on `http://localhost:${RAILS_PORT:-3000}`, Vite, and Solid Queue
 ./serve
 ```
 
-This runs Rails bound to `0.0.0.0` with stdout logging and Solid Queue.
+Precompiles assets, then opens a tmux session with two panes: the Rails
+server (production, bound to `0.0.0.0`, stdout logging) and the Solid Queue
+worker. Requires tmux. No Docker/Kamal — deploys to a single bare-metal/VPS
+host.
 
 ## Verification
 

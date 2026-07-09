@@ -22,7 +22,6 @@ Rails.application.configure do
   config.consider_all_requests_local = true
   config.cache_store = :solid_cache_store
   config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable

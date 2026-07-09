@@ -1,42 +1,35 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Load environment variables
+set -a
+[ -f .env ] && . .env
+set +a
+
 export RAILS_ENV="${RAILS_ENV:-production}"
 export RAILS_LOG_TO_STDOUT="${RAILS_LOG_TO_STDOUT:-1}"
 export RAILS_SERVE_STATIC_FILES="${RAILS_SERVE_STATIC_FILES:-true}"
 
+SESSION="comunidad-antesis"
 RAILS_PORT="${RAILS_PORT:-3000}"
-pids=()
 
-if [ -d "$HOME/.rbenv" ]; then
-  export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
-  eval "$(rbenv init - bash)" 2>/dev/null || true
-fi
+# Build assets (Vite build runs via the Rails asset pipeline hook)
+bin/rails assets:precompile
 
-start_process() {
-  "$@" &
-  pids+=("$!")
-}
+# Kill existing session if any
+tmux kill-session -t "$SESSION" 2>/dev/null || true
 
-stop_processes() {
-  for pid in "${pids[@]:-}"; do
-    kill "$pid" 2>/dev/null || true
-  done
-}
+# Create session with first pane
+tmux new-session -d -s "$SESSION" -n main
 
-wait_for_processes() {
-  status=0
+# Split into 2 panes
+tmux split-window -h -t "$SESSION"
 
-  for pid in "${pids[@]}"; do
-    wait "$pid" || status="$?"
-  done
+# Pane 1: Rails server (production)
+tmux send-keys -t "$SESSION:main.1" "source .env 2>/dev/null; RAILS_ENV=$RAILS_ENV bin/rails server -p $RAILS_PORT -b 0.0.0.0" C-m
 
-  return "$status"
-}
+# Pane 2: Solid Queue worker
+tmux send-keys -t "$SESSION:main.2" "source .env 2>/dev/null; RAILS_ENV=$RAILS_ENV RAILS_LOG_TO_STDOUT=1 bin/jobs" C-m
 
-trap stop_processes INT TERM EXIT
-
-start_process bin/rails server -p "$RAILS_PORT" -b 0.0.0.0
-start_process bin/jobs
-
-wait_for_processes
+# Attach to session
+tmux attach -t "$SESSION"

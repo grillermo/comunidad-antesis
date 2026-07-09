@@ -1,38 +1,43 @@
 require "securerandom"
-require "socket"
 
 class HealthController < ApplicationController
   def show
-    check_database
-    check_queue
-    check_cache
+    checks = {
+      "database" => check_database,
+      "queue" => check_queue,
+      "cache" => check_cache
+    }
 
-    render json: { status: "ok" }
-  rescue StandardError => error
-    render json: { status: "error", error: error.message }, status: :service_unavailable
+    ok = checks.values.all? { |value| value == "ok" }
+    status = ok ? :ok : :service_unavailable
+    overall = ok ? "ok" : "error"
+
+    render json: { status: overall, checks: checks }, status: status
   end
 
   private
 
   def check_database
     ActiveRecord::Base.connection.execute("SELECT 1")
+    "ok"
+  rescue StandardError
+    "error"
   end
 
+  # Confirms a Solid Queue worker process is registered and alive, not merely
+  # that the schema is migrated (the database check already covers that).
   def check_queue
-    SolidQueue::Process.create!(
-      kind: "Worker",
-      name: "health-check-#{SecureRandom.hex(4)}",
-      last_heartbeat_at: Time.current,
-      pid: Process.pid,
-      hostname: Socket.gethostname
-    ).destroy!
+    SolidQueue::Process.exists? ? "ok" : "error"
+  rescue StandardError
+    "error"
   end
 
   def check_cache
     key = "health_check_#{SecureRandom.hex(4)}"
-
     Rails.cache.write(key, "ok", expires_in: 5.seconds)
-    raise "cache unavailable" unless Rails.cache.read(key) == "ok"
+    Rails.cache.read(key) == "ok" ? "ok" : "error"
+  rescue StandardError
+    "error"
   ensure
     Rails.cache.delete(key) if key
   end

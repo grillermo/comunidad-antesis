@@ -6,60 +6,24 @@
 # Configure Using Gemfile
 #   gem "pg"
 #
+# Single unified database per environment: application data plus Solid Queue
+# and Solid Cache tables all live in one schema (see db/schema.rb).
+#
 default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
 
 development:
-  primary:
-    <<: *default
-    database: comunidad_antesis_development
-  cache:
-    <<: *default
-    database: comunidad_antesis_development_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *default
-    database: comunidad_antesis_development_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *default
-    database: comunidad_antesis_development_cable
-    migrations_paths: db/cable_migrate
+  <<: *default
+  database: comunidad_antesis_development
 
 test:
-  primary:
-    <<: *default
-    database: comunidad_antesis_test
-  cache:
-    <<: *default
-    database: comunidad_antesis_test_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *default
-    database: comunidad_antesis_test_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *default
-    database: comunidad_antesis_test_cable
-    migrations_paths: db/cable_migrate
+  <<: *default
+  database: comunidad_antesis_test
 
 production:
-  primary: &primary_production
-    <<: *default
-    database: comunidad_antesis_production
-    username: comunidad_antesis
-    password: <%= ENV["COMUNIDAD_ANTESIS_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: comunidad_antesis_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: comunidad_antesis_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: comunidad_antesis_production_cable
-    migrations_paths: db/cable_migrate
+  <<: *default
+  database: comunidad_antesis_production
+  username: comunidad_antesis
+  password: <%= ENV["COMUNIDAD_ANTESIS_DATABASE_PASSWORD"] %>
