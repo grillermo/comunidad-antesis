@@ -106,9 +106,9 @@ class NewsletterEmail < ApplicationRecord
   before_validation :normalize_email
 
   validates :email,
-    presence: true,
-    format: { with: URI::MailTo::EMAIL_REGEXP },
-    uniqueness: { case_sensitive: false }
+    presence: { message: "Escribe tu correo." },
+    format: { with: URI::MailTo::EMAIL_REGEXP, message: "El correo no es válido." },
+    uniqueness: { case_sensitive: false, message: "Ya estás en la lista." }
 
   private
 
@@ -117,6 +117,13 @@ class NewsletterEmail < ApplicationRecord
   end
 end
 ```
+
+Spanish messages keep the inline error consistent with the rest of the UI.
+Note the `presence` message only shows if the field is blank; `format`
+covers malformed input. (The `:taken`/`uniqueness` case is normally
+intercepted by the controller and shown as the "ya estás en la lista"
+success-style state rather than an inline field error, but the message is
+set for completeness.)
 
 - [ ] **Step 6: Run the spec, confirm it passes**
 
@@ -442,7 +449,7 @@ export default function Landing({ subscribed, alreadySubscribed, source }) {
 
               {form.errors.email && (
                 <p id="email-error" role="alert" className="mt-2 text-sm text-orange-ink">
-                  {form.errors.email}
+                  {Array.isArray(form.errors.email) ? form.errors.email[0] : form.errors.email}
                 </p>
               )}
 
