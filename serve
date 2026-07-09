@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export RAILS_ENV="${RAILS_ENV:-production}"
+export RAILS_LOG_TO_STDOUT="${RAILS_LOG_TO_STDOUT:-1}"
+export RAILS_SERVE_STATIC_FILES="${RAILS_SERVE_STATIC_FILES:-true}"
+
+RAILS_PORT="${RAILS_PORT:-3000}"
+pids=()
+
+if [ -d "$HOME/.rbenv" ]; then
+  export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
+  eval "$(rbenv init - bash)" 2>/dev/null || true
+fi
+
+start_process() {
+  "$@" &
+  pids+=("$!")
+}
+
+stop_processes() {
+  for pid in "${pids[@]:-}"; do
+    kill "$pid" 2>/dev/null || true
+  done
+}
+
+wait_for_processes() {
+  status=0
+
+  for pid in "${pids[@]}"; do
+    wait "$pid" || status="$?"
+  done
+
+  return "$status"
+}
+
+trap stop_processes INT TERM EXIT
+
+start_process bin/rails server -p "$RAILS_PORT" -b 0.0.0.0
+start_process bin/jobs
+
+wait_for_processes
