@@ -8,7 +8,7 @@
 
 Add authentication and role-based authorization to the app. Users log in with
 email + password (Devise), there is no public self-registration, and an admin
-manages all accounts through a RailsAdmin UI mounted at `/admin`. The landing
+manages all accounts through a RailsAdmin UI mounted at `/antesis-admin`. The landing
 page (`/`) gains a logged-in state. This phase builds the auth foundation that
 Phase 2c (ebook/sections, authenticated-only) and Phase 2d (comments,
 role-gated) depend on.
@@ -20,7 +20,7 @@ role-gated) depend on.
 - Two roles (`commenter`, `admin`) as a string-backed enum.
 - Custom Inertia/React login page (no Devise ERB views).
 - Logout.
-- RailsAdmin at `/admin`, admin-only, for user management.
+- RailsAdmin at `/antesis-admin`, admin-only, for user management.
 - `Current.user` + Inertia shared `user` prop; landing shows logged-in state.
 - One seeded admin from env vars for a fresh DB.
 - RSpec coverage for the above.
@@ -39,7 +39,7 @@ role-gated) depend on.
 | Login identifier | Email + password | Simpler standard Devise; email is also needed for Phase 2d reply-notification emails. |
 | Roles | `enum :role, { commenter: "commenter", admin: "admin" }`, string-backed, default `commenter`, `null: false` | Two mutually-exclusive tiers (viewer dropped per user). Strings are DB-readable. |
 | Devise modules | `database_authenticatable, validatable, rememberable, trackable` | Login, remember-me, and sign-in analytics without needing a mailer. No `registerable`/`recoverable`/`confirmable`. |
-| Account creation | RailsAdmin UI + one env-seeded admin | User chose RailsAdmin (`railsadminteam/rails_admin`). Seed admin bootstraps a fresh DB so `/admin` is reachable. |
+| Account creation | RailsAdmin UI + one env-seeded admin | User chose RailsAdmin (`railsadminteam/rails_admin`). Seed admin bootstraps a fresh DB so `/antesis-admin` is reachable. |
 | RailsAdmin assets | Propshaft (the app's existing pipeline) | RailsAdmin 3 supports propshaft (railsadminteam/rails_admin#3675); no sprockets needed, no second asset pipeline. |
 | Post-login destination | Redirect to `/` (landing, logged-in state) | No protected app pages exist until 2c; landing already renders via Inertia. |
 | Current user sharing | `Current` (ActiveSupport::CurrentAttributes) + activate `inertia_share` in `InertiaController` | The commented `inertia_share user:` line in `InertiaController` is the intended home for this. |
@@ -48,7 +48,7 @@ role-gated) depend on.
 
 ### Gems
 - `devise` — authentication.
-- `rails_admin ~> 3.3` — admin UI at `/admin`. Transitively pulls
+- `rails_admin ~> 3.3` — admin UI at `/antesis-admin`. Transitively pulls
   `turbo-rails`, `kaminari`, `nested_form`; these are scoped to the mounted
   engine's own server-rendered pages and do not affect Inertia pages. (The
   HANDOFF warning was specifically about Action Cable / `solid_cable`, not the
@@ -84,7 +84,7 @@ devise_for :users,
   controllers: { sessions: "users/sessions" }
 
 authenticate :user, ->(u) { u.admin? } do
-  mount RailsAdmin::Engine => "/admin", as: "rails_admin"
+  mount RailsAdmin::Engine => "/antesis-admin", as: "rails_admin"
 end
 ```
 - `Users::SessionsController < Devise::SessionsController` overrides `new` to
@@ -122,10 +122,10 @@ end
   Devise's Spanish auth error.
 - `Landing.jsx` updated: when the `user` prop is present, show a greeting +
   "Cerrar sesión" (logout, `DELETE /users/sign_out`); if `user.role === "admin"`,
-  show an "Admin" link to `/admin`. When absent, show an "Iniciar sesión" link
+  show an "Admin" link to `/antesis-admin`. When absent, show an "Iniciar sesión" link
   to `/users/sign_in`. Anonymous landing behavior (email capture) is unchanged.
-
 ### Localization
+
 Set `config.i18n.default_locale = :es` (in `config/application.rb`) and add a
 `config/locales/devise.es.yml` so Devise's flash/error messages render in
 Spanish, consistent with the existing `NewsletterEmail` Spanish messages.
@@ -149,7 +149,7 @@ Documented in `.env.example` if present.
 - `serve` already runs `bin/rails assets:precompile`; propshaft will include
   RailsAdmin's assets automatically (no new pane, no extra step).
 - `serve-dev`: propshaft serves RailsAdmin's assets in development the same way
-  it serves the app's; no Vite change needed for `/admin`. Verify `/admin`
+  it serves the app's; no Vite change needed for `/antesis-admin`. Verify `/antesis-admin`
   renders styled under `serve-dev`.
 
 ## Testing (RSpec)
@@ -158,7 +158,7 @@ Documented in `.env.example` if present.
   password validation (Devise `validatable`); role enum defaults to
   `commenter`; `admin?`/`commenter?` predicates.
 - **Request** (`spec/requests/`):
-  - `/admin` → redirect/deny for anonymous, deny for commenter, allow for admin.
+  - `/antesis-admin` → redirect/deny for anonymous, deny for commenter, allow for admin.
   - Login success (valid creds → redirect `/`, session set).
   - Login failure (bad creds → Login re-rendered, Spanish flash, no session).
   - Logout clears the session; `DELETE /users/sign_out` returns a 303 redirect
