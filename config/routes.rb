@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
-  root "welcome#index"
+  root "landing#index"
+
+  resources :newsletter_emails, only: [:create]
 
   get "/health", to: "health#show"
 
