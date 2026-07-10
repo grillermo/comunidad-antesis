@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users,
+    skip: [ :registrations ],
+    controllers: { sessions: "users/sessions" }
   root "landing#index"
 
   resources :newsletter_emails, only: [:create]
