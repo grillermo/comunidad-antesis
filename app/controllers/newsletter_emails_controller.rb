@@ -20,6 +20,6 @@ class NewsletterEmailsController < InertiaController
   end
 
   def duplicate?(record)
-    record.errors.details[:email].any? { |detail| detail[:error] == :taken }
+    record.errors.of_kind?(:email, :taken)
   end
 end
