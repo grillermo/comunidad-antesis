@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :users
   root "landing#index"
 
   resources :newsletter_emails, only: [:create]
