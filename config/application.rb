@@ -24,6 +24,7 @@ module ComunidadAntesis
     config.load_defaults 8.0
     config.i18n.default_locale = :es
     config.i18n.available_locales = [ :es, :en ]
+    config.i18n.fallbacks = { es: :en }
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.

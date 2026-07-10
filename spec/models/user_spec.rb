@@ -25,4 +25,9 @@ RSpec.describe User, type: :model do
     expect(user).not_to be_valid
     expect(user.errors[:password]).to be_present
   end
+
+  it "falls back to generic English validation error messages" do
+    expect { User.create!(email: "invalid@example.com") }
+      .to raise_error(ActiveRecord::RecordInvalid, /Validation failed/)
+  end
 end

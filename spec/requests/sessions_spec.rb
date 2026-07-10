@@ -1,6 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "Sessions", type: :request do
+  before { Rails.cache.clear }
+  after { Rails.cache.clear }
+
   def inertia_page
     JSON.parse(Nokogiri::HTML(response.body).at_css("script[data-page]").text)
   end
@@ -42,6 +45,56 @@ RSpec.describe "Sessions", type: :request do
 
   it "rejects an unknown email using the same generic alert" do
     expect_rejected_sign_in(email: "unknown@example.com")
+  end
+
+  it "allows attempts below both login limits to use Devise's generic failure response" do
+    5.times do
+      post "/users/sign_in", params: { user: { email: "below@example.com", password: "wrong" } }
+
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    follow_redirect!
+    expect(inertia_page.dig("props", "alert")).to eq("Correo o contraseña no válidos.")
+  end
+
+  it "rate limits the sixth attempt for the same normalized email" do
+    submitted_emails = [
+      " Person@Example.com ",
+      "PERSON@example.com",
+      "person@EXAMPLE.com",
+      " person@example.com",
+      "person@example.com ",
+      "person@example.com"
+    ]
+
+    submitted_emails.first(5).each do |email|
+      post "/users/sign_in", params: { user: { email: email, password: "wrong" } }
+
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    post "/users/sign_in", params: { user: { email: submitted_emails.last, password: "wrong" } }
+
+    expect(response).to have_http_status(:too_many_requests)
+  end
+
+  it "rate limits the eleventh attempt from one IP across distinct emails" do
+    remote_ip = "203.0.113.10"
+
+    10.times do |attempt|
+      post "/users/sign_in",
+        params: { user: { email: "person#{attempt}@example.com", password: "wrong" } },
+        headers: { "REMOTE_ADDR" => remote_ip }
+
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    post "/users/sign_in",
+      params: { user: { email: "person10@example.com", password: "wrong" } },
+      headers: { "REMOTE_ADDR" => remote_ip }
+
+    expect(response).to have_http_status(:too_many_requests)
   end
 
   it "signs out with a 303 redirect (Inertia requirement)" do

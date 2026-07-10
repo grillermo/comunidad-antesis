@@ -2,10 +2,12 @@ require "rails_helper"
 
 RSpec.describe "RailsAdmin access", type: :request do
   it "redirects anonymous users away from the admin" do
+    login_path = new_user_session_path
+
     get "/antesis-admin"
 
     expect(response).to have_http_status(:found)
-    expect(response).not_to have_http_status(:ok)
+    expect(response).to redirect_to(login_path)
   end
 
   it "hides the admin from an authenticated commenter" do
@@ -22,5 +24,6 @@ RSpec.describe "RailsAdmin access", type: :request do
     get "/antesis-admin"
 
     expect(response).to have_http_status(:ok)
+    expect(response.body).not_to match(/translation missing/i)
   end
 end
