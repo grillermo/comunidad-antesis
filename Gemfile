@@ -55,3 +55,7 @@ gem "inertia_rails", "~> 3.21"
 gem "vite_rails", "~> 3.11"
 
 gem "http", "~> 6.0"
+
+gem "devise", "~> 5.0"
+
+gem "rails_admin", "~> 3.3"
