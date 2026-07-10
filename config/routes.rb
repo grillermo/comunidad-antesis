@@ -2,6 +2,11 @@ Rails.application.routes.draw do
   devise_for :users,
     skip: [ :registrations ],
     controllers: { sessions: "users/sessions" }
+
+  authenticate :user, ->(user) { user.admin? } do
+    mount RailsAdmin::Engine => "/antesis-admin", as: "rails_admin"
+  end
+
   root "landing#index"
 
   resources :newsletter_emails, only: [:create]
