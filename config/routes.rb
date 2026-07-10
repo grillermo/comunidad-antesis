@@ -9,6 +9,13 @@ Rails.application.routes.draw do
 
   root "landing#index"
 
+  get "/manual-del-color-vivo", to: "manual#index", as: :manual
+  Manual.walk do |_node, path|
+    get "/manual-del-color-vivo/#{path.join('/')}",
+        to: "manual#show",
+        defaults: { component: path.join("/") }
+  end
+
   resources :newsletter_emails, only: [:create]
 
   get "/health", to: "health#show"
