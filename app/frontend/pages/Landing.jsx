@@ -1,7 +1,7 @@
-import { useForm } from '@inertiajs/react'
+import { useForm, router } from '@inertiajs/react'
 import coverUrl from '../assets/cover.jpg'
 
-export default function Landing({ subscribed, alreadySubscribed, source }) {
+export default function Landing({ subscribed, alreadySubscribed, source, user }) {
   const form = useForm({ email: '', source: source || '' })
 
   const submit = (e) => {
@@ -11,6 +11,25 @@ export default function Landing({ subscribed, alreadySubscribed, source }) {
 
   return (
     <main className="min-h-screen bg-cream font-body text-blue-ink">
+      <header className="mx-auto flex max-w-6xl items-center justify-end gap-4 px-6 py-4 text-sm">
+        {user ? (
+          <>
+            <span className="text-blue-ink/80">Hola, {user.email}</span>
+            {user.role === 'admin' && (
+              <a href="/antesis-admin" className="font-display font-semibold text-blue">Admin</a>
+            )}
+            <button
+              type="button"
+              onClick={() => router.delete('/users/sign_out')}
+              className="font-display font-semibold text-orange-ink"
+            >
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <a href="/users/sign_in" className="font-display font-semibold text-blue">Iniciar sesión</a>
+        )}
+      </header>
       <div className="mx-auto grid min-h-screen max-w-6xl grid-cols-1 items-center gap-8 px-6 md:grid-cols-2">
         {/* Left column */}
         <div className="max-w-md">

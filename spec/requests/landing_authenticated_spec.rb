@@ -25,4 +25,12 @@ RSpec.describe "Landing shared user prop", type: :request do
       "role" => user.role
     )
   end
+
+  it "exposes the admin role used to authorize the admin link" do
+    sign_in User.create!(email: "boss@example.com", password: "password123", role: :admin)
+    get "/"
+
+    page = JSON.parse(Nokogiri::HTML(response.body).at_css("script[data-page]").text)
+    expect(page.dig("props", "user", "role")).to eq("admin")
+  end
 end
