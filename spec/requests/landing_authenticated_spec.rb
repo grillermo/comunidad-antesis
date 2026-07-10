@@ -6,7 +6,9 @@ RSpec.describe "Landing shared user prop", type: :request do
     expect(response).to have_http_status(:ok)
 
     page = JSON.parse(Nokogiri::HTML(response.body).at_css("script[data-page]").text)
-    expect(page.dig("props", "user")).to be_nil
+    props = page.fetch("props")
+    expect(props).to include("user")
+    expect(props.fetch("user")).to be_nil
   end
 
   it "exposes the user prop when signed in" do
