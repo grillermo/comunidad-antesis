@@ -37,7 +37,7 @@ role-gated) depend on.
 |---|---|---|
 | Auth engine | Devise, custom Inertia views | Spec says "devise"; Devise's Turbo/ERB views are replaced by a React login page so it fits Inertia. |
 | Login identifier | Email + password | Simpler standard Devise; email is also needed for Phase 2d reply-notification emails. |
-| Roles | `enum role: { commenter: "commenter", admin: "admin" }`, string-backed, default `commenter`, `null: false` | Two mutually-exclusive tiers (viewer dropped per user). Strings are DB-readable. |
+| Roles | `enum :role, { commenter: "commenter", admin: "admin" }`, string-backed, default `commenter`, `null: false` | Two mutually-exclusive tiers (viewer dropped per user). Strings are DB-readable. |
 | Devise modules | `database_authenticatable, validatable, rememberable, trackable` | Login, remember-me, and sign-in analytics without needing a mailer. No `registerable`/`recoverable`/`confirmable`. |
 | Account creation | RailsAdmin UI + one env-seeded admin | User chose RailsAdmin (`railsadminteam/rails_admin`). Seed admin bootstraps a fresh DB so `/admin` is reachable. |
 | RailsAdmin assets | Propshaft (the app's existing pipeline) | RailsAdmin 3 supports propshaft (railsadminteam/rails_admin#3675); no sprockets needed, no second asset pipeline. |
@@ -91,10 +91,14 @@ end
   `render inertia: "Login"` and lets `create`/`destroy` use Devise's flow,
   redirecting to `/` on success and re-rendering Login with a Spanish flash on
   failure.
-- RailsAdmin is additionally guarded in its initializer
-  (`config.authenticate_with` → require `current_user`; `config.authorize_with`
-  → `unless current_user&.admin?` raise `Forbidden`) as defense in depth beyond
-  the route constraint. Non-admins never reach the engine.
+- RailsAdmin is additionally guarded in its initializer as defense in depth
+  beyond the route constraint. Because RailsAdmin's controllers do **not**
+  inherit from `ApplicationController`, its guards resolve the user via Warden/
+  Devise directly (`warden.authenticate!(scope: :user)` in
+  `config.authenticate_with`, and `config.authorize_with { unless
+  warden.user&.admin? ... }`), **not** via the `Current.user` set in
+  `ApplicationController`'s `before_action` (which may be unset in the engine's
+  request cycle). Non-admins never reach the engine.
 
 ### Current user + Inertia sharing
 - Add `app/models/current.rb`:
@@ -122,14 +126,24 @@ end
   to `/users/sign_in`. Anonymous landing behavior (email capture) is unchanged.
 
 ### Localization
-Devise flash messages in Spanish, consistent with the existing
-`NewsletterEmail` Spanish validation messages (e.g. via `config/locales/devise.es.yml`
-and setting the default locale, or overriding the specific flash keys used).
+Set `config.i18n.default_locale = :es` (in `config/application.rb`) and add a
+`config/locales/devise.es.yml` so Devise's flash/error messages render in
+Spanish, consistent with the existing `NewsletterEmail` Spanish messages.
+Nothing currently relies on `:en` I18n (existing strings are hardcoded Spanish),
+so flipping the default locale is low-risk and matches the Spanish-only product.
 
 ### Seeds
 `db/seeds.rb` creates one admin if none exists, from `ADMIN_EMAIL` /
-`ADMIN_PASSWORD` (dotenv). Idempotent (`find_or_create_by!(email:)`). Documented
-in `.env.example` if present.
+`ADMIN_PASSWORD` (dotenv). Idempotent, with `password` and `role` set in the
+create block (not the finder) so a re-run matches only on email and the created
+record is valid:
+```ruby
+User.find_or_create_by!(email: ENV.fetch("ADMIN_EMAIL")) do |u|
+  u.password = ENV.fetch("ADMIN_PASSWORD")
+  u.role = :admin
+end
+```
+Documented in `.env.example` if present.
 
 ### serve / serve-dev updates
 - `serve` already runs `bin/rails assets:precompile`; propshaft will include
@@ -147,7 +161,8 @@ in `.env.example` if present.
   - `/admin` → redirect/deny for anonymous, deny for commenter, allow for admin.
   - Login success (valid creds → redirect `/`, session set).
   - Login failure (bad creds → Login re-rendered, Spanish flash, no session).
-  - Logout clears the session.
+  - Logout clears the session; `DELETE /users/sign_out` returns a 303 redirect
+    (Inertia requires 303 after non-GET) landing on the public Landing page.
   - Landing exposes the `user` Inertia prop when authenticated, and not when
     anonymous.
 - The existing 14 examples must remain green (`bundle exec rspec`).
