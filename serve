@@ -13,7 +13,7 @@ export RAILS_SERVE_STATIC_FILES="${RAILS_SERVE_STATIC_FILES:-true}"
 SESSION="comunidad-antesis"
 RAILS_PORT="${RAILS_PORT:-3000}"
 
-# Build assets (Vite build runs via the Rails asset pipeline hook)
+# Build assets (assets:precompile runs Vite, including RailsAdmin at /antesis-admin)
 bin/rails assets:precompile
 
 # Kill existing session if any

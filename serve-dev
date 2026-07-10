@@ -22,7 +22,7 @@ tmux split-window -v -t "$SESSION"
 # Pane 1: Rails server
 tmux send-keys -t "$SESSION:main.1" "source .env 2>/dev/null; bin/rails server -p $RAILS_PORT -b 0.0.0.0" C-m
 
-# Pane 2: Vite dev server (HMR)
+# Pane 2: Vite dev server (HMR, including RailsAdmin at /antesis-admin)
 tmux send-keys -t "$SESSION:main.2" "source .env 2>/dev/null; bin/vite dev" C-m
 
 # Pane 3: Solid Queue worker
