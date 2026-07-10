@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_09_000002) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_09_100001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "newsletter_emails", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_newsletter_emails_on_email", unique: true
+  end
 
   create_table "solid_cache_entries", force: :cascade do |t|
     t.binary "key", null: false
