@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.5"
+gem "rails", "8.0.5"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -46,9 +46,9 @@ group :development do
   gem "web-console"
 end
 
-gem "dotenv-rails", "~> 3.2", groups: [:development, :test]
+gem "dotenv-rails", "~> 3.2", groups: [ :development, :test ]
 
-gem "rspec-rails", "~> 8.0", groups: [:development, :test]
+gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]
 
 gem "inertia_rails", "~> 3.21"
 
