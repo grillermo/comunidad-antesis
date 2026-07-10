@@ -14,13 +14,6 @@ class Users::SessionsController < Devise::SessionsController
 
   # Let Warden redirect failed sign-ins so the Inertia page receives the alert.
   def auth_options
-    super.except(:recall).merge(message: :invalid)
-  end
-
-  private
-
-  # Inertia requires a 303 redirect after a non-GET request (logout is DELETE).
-  def respond_to_on_destroy(non_navigational_status: :no_content)
-    redirect_to after_sign_out_path_for(resource_name), status: :see_other
+    super.except(:recall)
   end
 end

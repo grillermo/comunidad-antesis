@@ -1,11 +1,26 @@
 require "rails_helper"
 
 RSpec.describe "Sessions", type: :request do
+  def inertia_page
+    JSON.parse(Nokogiri::HTML(response.body).at_css("script[data-page]").text)
+  end
+
+  def expect_rejected_sign_in(email:)
+    post "/users/sign_in", params: { user: { email: email, password: "wrong" } }
+
+    expect(response).to redirect_to(new_user_session_path)
+    expect(request.env.fetch("warden")).not_to be_authenticated(:user)
+
+    follow_redirect!
+    expect(response.body).not_to include("wrong")
+    expect(inertia_page.dig("props", "alert")).to eq("Correo o contraseña no válidos.")
+  end
+
   it "renders the login page" do
     get "/users/sign_in"
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Login")
+    expect(inertia_page.fetch("component")).to eq("Login")
   end
 
   it "signs in with valid credentials and redirects to root" do
@@ -14,21 +29,19 @@ RSpec.describe "Sessions", type: :request do
     post "/users/sign_in", params: { user: { email: "user@example.com", password: "password123" } }
 
     expect(response).to redirect_to(root_path)
+    expect(request.env.fetch("warden")).to be_authenticated(:user)
     follow_redirect!
     expect(response).to have_http_status(:ok)
   end
 
-  it "rejects invalid credentials without a session" do
+  it "rejects a known email with the wrong password using a generic alert" do
     User.create!(email: "user@example.com", password: "password123")
 
-    post "/users/sign_in", params: { user: { email: "user@example.com", password: "wrong" } }
+    expect_rejected_sign_in(email: "user@example.com")
+  end
 
-    expect(response).to redirect_to(new_user_session_path)
-    expect(request.env.fetch("warden")).not_to be_authenticated(:user)
-
-    follow_redirect!
-    expect(response.body).to include("Correo o contraseña no válidos.")
-    expect(response.body).not_to include("wrong")
+  it "rejects an unknown email using the same generic alert" do
+    expect_rejected_sign_in(email: "unknown@example.com")
   end
 
   it "signs out with a 303 redirect (Inertia requirement)" do
@@ -39,9 +52,29 @@ RSpec.describe "Sessions", type: :request do
 
     expect(response).to have_http_status(:see_other)
     expect(response).to redirect_to(root_path)
+    expect(request.env.fetch("warden")).not_to be_authenticated(:user)
   end
 
-  it "has no self-registration route" do
+  it "preserves Devise's non-navigational logout response" do
+    user = User.create!(email: "user@example.com", password: "password123")
+    sign_in user
+
+    delete "/users/sign_out", as: :json
+
+    expect(response).to have_http_status(:no_content)
+    expect(response).not_to be_redirect
+    expect(request.env.fetch("warden")).not_to be_authenticated(:user)
+  end
+
+  it "preserves Devise's non-navigational response when already signed out" do
+    delete "/users/sign_out", as: :json
+
+    expect(response).to have_http_status(:unauthorized)
+    expect(response).not_to be_redirect
+  end
+
+  it "has no self-registration or password-recovery routes" do
     expect(Rails.application.routes.url_helpers).not_to respond_to(:new_user_registration_path)
+    expect(Rails.application.routes.url_helpers).not_to respond_to(:new_user_password_path)
   end
 end
