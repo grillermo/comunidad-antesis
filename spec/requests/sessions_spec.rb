@@ -47,6 +47,40 @@ RSpec.describe "Sessions", type: :request do
     expect_rejected_sign_in(email: "unknown@example.com")
   end
 
+  it "redirects an invalid Inertia XHR sign-in back to Login with the generic alert" do
+    User.create!(email: "user@example.com", password: "password123")
+    get "/users/sign_in"
+
+    expect(response).to have_http_status(:ok)
+
+    headers = {
+      "X-Inertia" => "true",
+      "X-Inertia-Version" => InertiaRails.configuration.version.to_s,
+      "X-Requested-With" => "XMLHttpRequest",
+      "Accept" => "text/html, application/xhtml+xml"
+    }
+
+    post "/users/sign_in",
+      params: { user: { email: "user@example.com", password: "wrong" } },
+      headers: headers,
+      as: :json
+
+    expect(response).to have_http_status(:found)
+    expect(response).to redirect_to(new_user_session_path)
+    expect(request.flash[:alert]).to eq("Correo o contraseña no válidos.")
+
+    follow_redirect!(headers: headers)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.media_type).to eq("application/json")
+    expect(response.headers.fetch("X-Inertia")).to eq("true")
+    expect(JSON.parse(response.body)).to include(
+      "component" => "Login",
+      "props" => include("alert" => "Correo o contraseña no válidos.")
+    )
+    expect(request.env.fetch("warden")).not_to be_authenticated(:user)
+  end
+
   it "rejects malformed login parameters with a bodyless bad request" do
     post "/users/sign_in", params: { user: "malformed" }
 
