@@ -9,11 +9,16 @@
 #   end
 
 if ENV["ADMIN_EMAIL"].present? && ENV["ADMIN_PASSWORD"].present?
-  User.find_or_create_by!(email: ENV.fetch("ADMIN_EMAIL")) do |u|
-    u.password = ENV.fetch("ADMIN_PASSWORD")
-    u.role = :admin
+  admin_email = ENV.fetch("ADMIN_EMAIL").strip.downcase
+  user = User.find_by(email: admin_email)
+
+  if user.nil?
+    User.create!(email: admin_email, password: ENV.fetch("ADMIN_PASSWORD"), role: :admin)
+  elsif !user.admin?
+    raise "Cannot seed admin #{admin_email}: email belongs to a non-admin user"
   end
-  puts "Seeded admin #{ENV.fetch('ADMIN_EMAIL')}"
+
+  puts "Seeded admin #{admin_email}"
 else
   puts "Skipping admin seed (set ADMIN_EMAIL and ADMIN_PASSWORD to enable)"
 end
