@@ -47,6 +47,20 @@ RSpec.describe "Sessions", type: :request do
     expect_rejected_sign_in(email: "unknown@example.com")
   end
 
+  it "rejects malformed login parameters with a bodyless bad request" do
+    post "/users/sign_in", params: { user: "malformed" }
+
+    expect(response).to have_http_status(:bad_request)
+    expect(response.body).to be_empty
+  end
+
+  it "rejects missing login parameters with a bodyless bad request" do
+    post "/users/sign_in"
+
+    expect(response).to have_http_status(:bad_request)
+    expect(response.body).to be_empty
+  end
+
   it "allows attempts below both login limits to use Devise's generic failure response" do
     5.times do
       post "/users/sign_in", params: { user: { email: "below@example.com", password: "wrong" } }
