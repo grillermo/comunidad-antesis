@@ -237,12 +237,14 @@ Both are tmux-based (Phase 1 convention — no Docker/Kamal).
 - **Request spec (the "all return 200" proof):** iterate `Manual.walk` (plus
   the index) and assert every route returns HTTP 200 for a signed-in user.
   This is the primary acceptance check for the phase.
-- **Auth spec:** an anonymous request to a manual route redirects to login.
-  Manual routes are Inertia endpoints, so the test asserts the app's
-  Inertia-aware unauthenticated response (a `409` with an
-  `X-Inertia-Location` header pointing at the login page, per the existing
-  "Redirect failed Inertia sign-ins" behavior — not a bare `302`). An unknown
-  slug (not in the tree) returns 404.
+- **Auth spec:** an anonymous **browser GET** to a manual route (no
+  `X-Inertia` header) gets Devise's standard `302` redirect to
+  `/users/sign_in`; the request spec asserts that. (The app has no custom
+  unauthenticated-Inertia handler, so the 409/`X-Inertia-Location` path used
+  by live Inertia XHR visits is not asserted here.) An unknown slug (no route
+  drawn) returns `404` — asserted on the response status, since the test env
+  (`show_exceptions = :rescuable`) renders `ActionController::RoutingError` as
+  a 404 rather than propagating it.
 - **Model spec:** `Manual` helpers — `walk` yields exactly **87** nodes (the 5
   content parts + their descendants + the 3 leaf pages `atlas-del-color`,
   `epilogo`, `glosario`; the `/manual-del-color-vivo` index is a separate
