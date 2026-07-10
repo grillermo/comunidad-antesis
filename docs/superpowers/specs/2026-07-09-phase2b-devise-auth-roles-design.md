@@ -40,7 +40,7 @@ role-gated) depend on.
 | Roles | `enum role: { commenter: "commenter", admin: "admin" }`, string-backed, default `commenter`, `null: false` | Two mutually-exclusive tiers (viewer dropped per user). Strings are DB-readable. |
 | Devise modules | `database_authenticatable, validatable, rememberable, trackable` | Login, remember-me, and sign-in analytics without needing a mailer. No `registerable`/`recoverable`/`confirmable`. |
 | Account creation | RailsAdmin UI + one env-seeded admin | User chose RailsAdmin (`railsadminteam/rails_admin`). Seed admin bootstraps a fresh DB so `/admin` is reachable. |
-| RailsAdmin assets | Sprockets (RailsAdmin default), not Vite | User's explicit choice; avoids wiring RailsAdmin's asset bundle into Vite. |
+| RailsAdmin assets | Propshaft (the app's existing pipeline) | RailsAdmin 3 supports propshaft (railsadminteam/rails_admin#3675); no sprockets needed, no second asset pipeline. |
 | Post-login destination | Redirect to `/` (landing, logged-in state) | No protected app pages exist until 2c; landing already renders via Inertia. |
 | Current user sharing | `Current` (ActiveSupport::CurrentAttributes) + activate `inertia_share` in `InertiaController` | The commented `inertia_share user:` line in `InertiaController` is the intended home for this. |
 
@@ -53,20 +53,12 @@ role-gated) depend on.
   engine's own server-rendered pages and do not affect Inertia pages. (The
   HANDOFF warning was specifically about Action Cable / `solid_cable`, not the
   `turbo-rails` gem, and no Action Cable is introduced.)
-- `sprockets-rails` — required for RailsAdmin's asset serving in sprockets mode.
-
-### Asset pipeline coexistence (implementation risk to resolve in the plan)
-The app currently uses **propshaft** for its own assets and **Vite** for the
-Inertia/React frontend. Adding `sprockets-rails` for RailsAdmin means sprockets
-and propshaft both register asset tasks. The plan must ensure:
-- App/Inertia assets continue to build via Vite + propshaft exactly as today
-  (landing page, `application.css` `@theme` tokens unchanged).
-- Sprockets serves **only** RailsAdmin's gem-provided assets (its manifest /
-  `rails_admin.css`/`rails_admin.js`), not the app's.
-- `bin/rails assets:precompile` produces both sets without conflict.
-If propshaft + sprockets-rails cannot cleanly coexist, the plan falls back to
-RailsAdmin's importmap or Vite/cssbundling asset mode — but the default target
-is sprockets per the user's decision.
+### Asset pipeline
+RailsAdmin 3 supports **propshaft** (railsadminteam/rails_admin#3675), which is
+already the app's asset pipeline. RailsAdmin's gem-provided assets are served/
+precompiled by propshaft; the app/Inertia assets continue to build via Vite +
+propshaft exactly as today (landing page and `application.css` `@theme` tokens
+unchanged). No sprockets, no second asset pipeline, no importmap.
 
 ### User model
 `users` table (Devise-generated migration, extended):
@@ -140,12 +132,11 @@ and setting the default locale, or overriding the specific flash keys used).
 in `.env.example` if present.
 
 ### serve / serve-dev updates
-- `serve` already runs `bin/rails assets:precompile`; confirm it now also emits
-  RailsAdmin's sprockets assets (no new pane needed).
-- `serve-dev`: sprockets serves RailsAdmin assets dynamically in development, so
-  no Vite change is required for `/admin`. Verify `/admin` renders styled under
-  `serve-dev`; add a precompile step or note only if dynamic serving proves
-  insufficient.
+- `serve` already runs `bin/rails assets:precompile`; propshaft will include
+  RailsAdmin's assets automatically (no new pane, no extra step).
+- `serve-dev`: propshaft serves RailsAdmin's assets in development the same way
+  it serves the app's; no Vite change needed for `/admin`. Verify `/admin`
+  renders styled under `serve-dev`.
 
 ## Testing (RSpec)
 
@@ -163,8 +154,6 @@ in `.env.example` if present.
 
 ## Risks / Notes
 
-- **propshaft + sprockets-rails coexistence** is the main implementation risk;
-  see the asset-pipeline section. Resolve before wiring the rest.
 - RailsAdmin's UI is server-rendered inside its engine — expected and isolated;
   it does not change the Inertia app's rendering.
 - No mailer/SMTP is configured this phase; nothing depends on it yet.
