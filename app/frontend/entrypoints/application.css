@@ -2,3 +2,15 @@
 
 @plugin '@tailwindcss/typography';
 @plugin '@tailwindcss/forms';
+
+@theme {
+  --color-cream: #F5EFDA;
+  --color-blue: #33538C;
+  --color-blue-deep: #2C4C86;
+  --color-blue-ink: #2A3F6B;
+  --color-orange: #EF6C15;
+  --color-orange-ink: #E5620C;
+
+  --font-display: "Fredoka", ui-sans-serif, sans-serif;
+  --font-body: "Nunito Sans", ui-sans-serif, sans-serif;
+}
