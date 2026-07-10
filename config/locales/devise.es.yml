@@ -1,0 +1,16 @@
+es:
+  devise:
+    failure:
+      invalid: "Correo o contraseña no válidos."
+      not_found_in_database: "Correo o contraseña no válidos."
+      unauthenticated: "Necesitas iniciar sesión antes de continuar."
+      timeout: "Tu sesión expiró. Inicia sesión de nuevo."
+    sessions:
+      signed_in: "Sesión iniciada."
+      signed_out: "Sesión cerrada."
+      already_signed_out: "Sesión cerrada."
+  errors:
+    messages:
+      already_confirmed: "ya fue confirmada"
+      not_found: "no encontrado"
+      taken: "ya está en uso"
