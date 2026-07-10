@@ -22,14 +22,20 @@ tmux kill-session -t "$SESSION" 2>/dev/null || true
 # Create session with first pane
 tmux new-session -d -s "$SESSION" -n main
 
-# Split into 2 panes
+# Split into 3 panes
 tmux split-window -h -t "$SESSION"
+tmux split-window -v -t "$SESSION:main"
 
 # Pane 1: Rails server (production)
 tmux send-keys -t "$SESSION:main.1" "source .env 2>/dev/null; RAILS_ENV=$RAILS_ENV bin/rails server -p $RAILS_PORT -b 0.0.0.0" C-m
 
 # Pane 2: Solid Queue worker
 tmux send-keys -t "$SESSION:main.2" "source .env 2>/dev/null; RAILS_ENV=$RAILS_ENV RAILS_LOG_TO_STDOUT=1 bin/jobs" C-m
+
+# Pane 3: Inertia SSR server (bundle already built by assets:precompile)
+tmux send-keys -t "$SESSION:main.3" "source .env 2>/dev/null; bin/vite ssr" C-m
+
+tmux select-layout -t "$SESSION:main" tiled
 
 # Attach to session
 tmux attach -t "$SESSION"
