@@ -10,7 +10,7 @@ export default function Landing({ subscribed, alreadySubscribed, source, user })
   }
 
   return (
-    <main className="min-h-screen bg-cream font-body text-blue-ink">
+    <main className="flex min-h-screen flex-col bg-cream font-body text-blue-ink">
       <header className="mx-auto flex max-w-6xl items-center justify-end gap-4 px-6 py-4 text-sm">
         {user ? (
           <>
@@ -30,7 +30,7 @@ export default function Landing({ subscribed, alreadySubscribed, source, user })
           <a href="/users/sign_in" className="font-display font-semibold text-blue">Iniciar sesión</a>
         )}
       </header>
-      <div className="mx-auto grid min-h-screen max-w-6xl grid-cols-1 items-center gap-8 px-6 md:grid-cols-2">
+      <div className="mx-auto grid w-full flex-1 max-w-6xl grid-cols-1 items-center gap-8 px-6 md:grid-cols-2">
         {/* Left column */}
         <div className="max-w-md">
           <p className="font-display text-xs font-semibold uppercase tracking-[0.14em] text-orange-ink">
