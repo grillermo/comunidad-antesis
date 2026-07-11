@@ -1558,7 +1558,7 @@ git commit -m "Add CommentMailer reply and admin notifications"
 - Create: `app/controllers/moderation/approvals_controller.rb`
 - Test: `spec/requests/moderation_approvals_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `spec/requests/moderation_approvals_spec.rb`:
 
@@ -1591,12 +1591,12 @@ RSpec.describe "Moderation approvals", type: :request do
 end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/requests/moderation_approvals_spec.rb`
 Expected: FAIL — no controller.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `app/controllers/moderation/approvals_controller.rb`:
 
@@ -1644,12 +1644,12 @@ export default function ApprovalError() {
 }
 ```
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/requests/moderation_approvals_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/controllers/moderation app/frontend/pages/moderation spec/requests/moderation_approvals_spec.rb
