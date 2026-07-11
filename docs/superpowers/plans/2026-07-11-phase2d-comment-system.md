@@ -1350,7 +1350,7 @@ git commit -m "Add CommentsController#destroy soft delete"
 - Create: `app/controllers/hearts_controller.rb`
 - Test: `spec/requests/hearts_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `spec/requests/hearts_spec.rb`:
 
@@ -1383,12 +1383,12 @@ RSpec.describe "Hearts", type: :request do
 end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/requests/hearts_spec.rb`
 Expected: FAIL — no `HeartsController`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `app/controllers/hearts_controller.rb`:
 
@@ -1411,12 +1411,12 @@ class HeartsController < ApplicationController
 end
 ```
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/requests/hearts_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/controllers/hearts_controller.rb spec/requests/hearts_spec.rb
