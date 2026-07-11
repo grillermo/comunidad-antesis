@@ -2,13 +2,31 @@ namespace :manual do
   desc "Map each Manual section path to its source-PDF page range (dev-only, needs project/*.pdf)"
   task map_pdf_pages: :environment do
     require "open3"
-    require "shellwords"
     require "yaml"
 
-    pdf = Dir.glob(Rails.root.join("project/*.pdf")).first
-    abort "No PDF found under project/*.pdf (it is gitignored — add it locally)." unless pdf
+    pdfs = Dir.glob(Rails.root.join("project/*.pdf"))
+    abort "No PDF found under project/*.pdf (it is gitignored — add it locally)." if pdfs.empty?
 
-    page_count = Integer(`pdfinfo #{Shellwords.escape(pdf)}`[/Pages:\s+(\d+)/, 1])
+    pdf_page_counts = pdfs.to_h do |candidate|
+      info, error, status = Open3.capture3("pdfinfo", candidate.to_s)
+      abort "pdfinfo failed for #{candidate}: #{error.strip}" unless status.success?
+
+      count = info[/Pages:\s+(\d+)/, 1]
+      abort "pdfinfo did not report a page count for #{candidate}." unless count
+
+      [ candidate, Integer(count) ]
+    end
+
+    manuals = pdf_page_counts.select { |_candidate, count| count == 136 }
+    if manuals.empty?
+      found = pdf_page_counts.map { |candidate, count| "#{candidate} (#{count} pages)" }.join(", ")
+      abort "Could not find the 136-page Manual del Color Vivo under project/*.pdf. Found: #{found}"
+    end
+    if manuals.many?
+      abort "Found multiple 136-page PDFs under project/*.pdf; cannot choose the manual: #{manuals.keys.join(", ")}"
+    end
+
+    pdf, page_count = manuals.first
 
     # Extract normalized text per page once, up front.
     pages = (1..page_count).map do |n|
@@ -21,14 +39,21 @@ namespace :manual do
     scan_ahead = 12 # how many pages forward to search for the next title
 
     starts = {}          # "part/section" => start_page (1-based)
+    # The Color cotidiano divider is physically on pages 110-111, after some
+    # child recipes. Keep its full visual range without moving the scan cursor.
+    range_overrides = { "color-cotidiano" => [ 110, 111 ] }
     first_title = Manual::TextMatch.normalize(Manual.find(Manual.paths.first)[:title])
     cursor = pages.index { |page| page.include?(first_title) && !page.start_with?("contenido") } || 0
 
     Manual.paths.each do |path|
       component = path.join("/")
+      if range_overrides.key?(component)
+        starts[component] = nil
+        next
+      end
+
       title = Manual.find(path)[:title]
       pdf_title = {
-        "color-cotidiano" => "Crayones",
         "color-sobre-fibra/modificadores-y-tratamientos-de-color/sulfato-ferroso/receta-de-bano-modificador-con-sulfato-ferroso" =>
           "Receta de baño oscurecedor con sulfato ferroso"
       }.fetch(component, title)
@@ -67,7 +92,12 @@ namespace :manual do
     ordered = starts.to_a # already in book order (Manual.paths order)
     ranges = {}
     ordered.each_with_index do |(component, start), idx|
-      next_start = ordered[idx + 1]&.last
+      if range_overrides.key?(component)
+        ranges[component] = range_overrides.fetch(component)
+        next
+      end
+
+      next_start = ordered.drop(idx + 1).find { |_next_component, candidate| candidate }&.last
       last = next_start ? next_start - 1 : page_count
       last = start if last < start # guard against two sections on one page
       ranges[component] = [ start, last ]
