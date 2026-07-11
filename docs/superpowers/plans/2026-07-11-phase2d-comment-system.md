@@ -746,7 +746,7 @@ git commit -m "Add CommentSubscription model for reply notifications"
 - Modify: `app/models/user.rb`
 - Test: `spec/models/user_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `spec/models/user_spec.rb`:
 
@@ -760,12 +760,12 @@ Append to `spec/models/user_spec.rb`:
   end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/models/user_spec.rb -e "has comments"`
 Expected: FAIL — no `comments` association.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `app/models/user.rb` (inside the class):
 
@@ -775,12 +775,12 @@ Add to `app/models/user.rb` (inside the class):
   has_many :comment_subscriptions, dependent: :destroy
 ```
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/models/user_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/models/user.rb spec/models/user_spec.rb

@@ -30,4 +30,13 @@ RSpec.describe User, type: :model do
     expect { User.create!(email: "invalid@example.com") }
       .to raise_error(ActiveRecord::RecordInvalid, /Validation failed/)
   end
+
+  it "has comments, hearts, and comment subscriptions" do
+    user = create(:user)
+    comment = create(:comment, user: user)
+
+    expect(user.comments).to include(comment)
+    expect(user).to respond_to(:hearts)
+    expect(user).to respond_to(:comment_subscriptions)
+  end
 end
