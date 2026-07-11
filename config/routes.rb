@@ -16,6 +16,12 @@ Rails.application.routes.draw do
         defaults: { component: path.join("/") }
   end
 
+  if Rails.env.development?
+    get "/dev/manual_pdf_pages/:page.png",
+        to: "manual_pdf_pages#show",
+        constraints: { page: /\d+/ }
+  end
+
   resources :newsletter_emails, only: [:create]
 
   get "/health", to: "health#show"
