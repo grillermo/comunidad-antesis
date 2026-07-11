@@ -23,6 +23,14 @@ class CommentsController < ApplicationController
     redirect_to section_path_url(comment.section_path)
   end
 
+  def destroy
+    comment = Comment.find(params[:id])
+    return head :forbidden unless can_modify?(comment)
+
+    comment.soft_delete!
+    redirect_to section_path_url(comment.section_path)
+  end
+
   private
 
   def create_params

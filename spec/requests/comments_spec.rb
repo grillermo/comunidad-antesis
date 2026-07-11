@@ -101,4 +101,27 @@ RSpec.describe "Comments", type: :request do
       expect(comment.reload.body).to eq("orig")
     end
   end
+
+  describe "DELETE /comments/:id" do
+    let(:other) { create(:user) }
+    let!(:comment) { create(:comment, section_path: section, user: user, body: "bye") }
+
+    it "soft-deletes for the author and keeps the record" do
+      sign_in user
+
+      delete "/comments/#{comment.id}"
+
+      expect(comment.reload.deleted?).to be(true)
+      expect(Comment.exists?(comment.id)).to be(true)
+    end
+
+    it "forbids a non-author non-admin" do
+      sign_in other
+
+      delete "/comments/#{comment.id}"
+
+      expect(response).to have_http_status(:forbidden)
+      expect(comment.reload.deleted?).to be(false)
+    end
+  end
 end
