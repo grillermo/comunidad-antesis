@@ -1,8 +1,8 @@
 # Handoff: comunidad-antesis — Ebook Promo & Community Platform
 
-**Updated**: 2026-07-10
+**Updated**: 2026-07-11
 **Branch**: main
-**Status**: Phases 1, 2a, 2b, 2c, and the manual content authoring pass are complete on `main`. Ready to start Phase 2d.
+**Status**: Phases 1, 2a, 2b, 2c, 2d, and the manual content authoring pass are complete on `main`.
 
 ## Goal
 
@@ -52,14 +52,15 @@ phase needs details not captured here.
       side notes, subheadings, and part dividers. Five part illustrations and
       ten Atlas pages are optimized under `app/frontend/assets/manual/`.
       `spec/manual_content_spec.rb` prevents placeholder content from returning.
+- [x] **Phase 2d — Comment system.** Every manual section has authenticated,
+      unlimited nested comments with sanitized Markdown, hearts, subscriptions,
+      author/admin editing and soft-delete tombstones. Root comments can be
+      sticky. Admins receive signed approval links and moderate comments through
+      RailsAdmin. Inertia renders the recursive thread and refreshes comment props
+      after mutations.
 
 ## Not Yet Done
 
-- [ ] **Phase 2d — Comment system.** Nested comments per manual section,
-      role-gated behavior, markdown support, sticky top-level comments,
-      edit/delete by author or admin, up/down voting, reply-notification
-      emails, admin notification emails with inline approve link, and a simple
-      moderation UI.
 - [ ] **Final step after all phases:** write/update `AGENTS.md` and any other
       agent-facing docs for the finished app. Do this only after the comment
       system and content strategy are done.
@@ -77,6 +78,9 @@ phase needs details not captured here.
   content.
 - `/manual-del-color-vivo` and all 87 section routes require authentication.
 - `/antesis-admin` is admin-only; non-admins receive 404.
+- Comment posting, nested replies, heart toggle, editing, admin soft-delete,
+  tombstones, and signed approval were verified in a live browser on desktop
+  and mobile widths with no console errors.
 
 **Known local environment issue**
 
@@ -87,8 +91,8 @@ phase needs details not captured here.
 
 **Uncommitted changes**
 
-- `HANDOFF.md` may be modified by this handoff update. No other work should be
-  dirty after this edit unless a future agent changes it.
+- The existing `.gitignore` edit adding `.tokensave` is user-owned and remains
+  intentionally uncommitted. No Phase 2d implementation files should be dirty.
 
 ## Phase Docs
 
@@ -99,18 +103,14 @@ phase needs details not captured here.
 | 2b — Devise auth + roles | `docs/superpowers/specs/2026-07-09-phase2b-devise-auth-roles-design.md` | `docs/superpowers/plans/2026-07-09-phase2b-devise-auth-roles.md` |
 | 2c — Manual SSR webpage | `docs/superpowers/specs/2026-07-10-phase2c-manual-ssr-webpage-design.md` | `docs/superpowers/plans/2026-07-10-phase2c-manual-ssr-webpage.md` |
 | Manual content authoring | `docs/superpowers/specs/2026-07-10-manual-content-authoring-design.md` | `docs/superpowers/plans/2026-07-10-manual-content-authoring.md` |
+| 2d — Comment system | `docs/superpowers/specs/2026-07-11-phase2d-comment-system-design.md` | `docs/superpowers/plans/2026-07-11-phase2d-comment-system.md` |
 
-For Phase 2d, start with `superpowers:brainstorming`, then write a spec and
-plan before touching code.
+## Recent Phase 2d Commits
 
-## Recent Phase 2c Commits
-
-- `6fbd688` Add Manual table-of-contents tree for Phase 2c
-- `0c4475f` Add authenticated routes and controller for the manual
-- `56c62e3` Add manual layout, Contenido index page, and @ Vite alias
-- `743840d` Generate placeholder page stubs for every manual section
-- `808daa7` Enable Inertia SSR via vite_ruby Node server
-- `d170201` Run the Inertia SSR server in serve and serve-dev
+- `944f86f` Add ancestry, commonmarker, and factory_bot gems for comments
+- `d7b1230` Add FactoryBot config and minimal user factory
+- `6d23c09` Add comment thread UI to manual sections
+- `ca3ddc6` Allow preserved replies to update after parent deletion
 
 ## Files to Know
 
@@ -122,7 +122,15 @@ plan before touching code.
 | `app/controllers/inertia_controller.rb` | Base class for Inertia controllers and shared props. |
 | `app/models/manual.rb` | Static manual table of contents and route/page lookup helpers. Slugs are URL/page-path contracts; do not rename casually. |
 | `app/controllers/manual_controller.rb` | Authenticated Inertia manual index/show actions. `component` comes from route defaults, not direct user input. |
+| `app/models/comment.rb` | Comment tree, section integrity, Markdown cache, sticky rules, and soft-delete behavior. |
+| `app/models/heart.rb` | Unique positive reaction with `hearts_count` counter cache. |
+| `app/models/comment_subscription.rb` | Per-comment reply notification subscription. |
+| `app/serializers/comment_tree.rb` | Ordered recursive Inertia payload with viewer-specific permissions and heart state. |
+| `app/controllers/comments_controller.rb` | Create, edit, soft-delete, subscriptions, and notification dispatch. |
+| `app/controllers/hearts_controller.rb` | Authenticated heart toggle. |
+| `app/mailers/comment_mailer.rb` | Admin approval and subscriber reply emails. |
 | `app/frontend/components/ManualLayout.jsx` | Shared manual page layout. |
+| `app/frontend/components/comments/*.jsx` | Recursive comment thread, node actions, and post/reply forms. |
 | `app/frontend/pages/manual-del-color-vivo/Index.jsx` | Manual Contenido page. |
 | `app/frontend/components/manual/*.jsx` | Semantic components shared by the authored manual pages. |
 | `app/frontend/pages/manual-del-color-vivo/**/*.jsx` | Verbatim manual prose and visual pages for each authenticated route. |
@@ -163,8 +171,8 @@ Use the rbenv shim path in this environment:
 ```bash
 env PATH="/Users/grillermo/.rbenv/shims:$PATH" bundle exec rspec
 env PATH="/Users/grillermo/.rbenv/shims:$PATH" bin/rails manual:generate_stubs
-env PATH="/Users/grillermo/.rbenv/shims:$PATH" RAILS_ENV=production NODE_ENV=production bin/vite build --clear
-env PATH="/Users/grillermo/.rbenv/shims:$PATH" RAILS_ENV=production NODE_ENV=production bin/vite build --ssr
+env PATH="/Users/grillermo/.rbenv/shims:$PATH" SECRET_KEY_BASE_DUMMY=1 RAILS_ENV=production NODE_ENV=production bin/vite build --clear
+env PATH="/Users/grillermo/.rbenv/shims:$PATH" SECRET_KEY_BASE_DUMMY=1 RAILS_ENV=production NODE_ENV=production bin/vite build --ssr
 ```
 
 Per `/Users/grillermo/AGENTS.md`, prefix shell commands with `rtk` when running
@@ -180,16 +188,8 @@ rtk proxy env PATH="/Users/grillermo/.rbenv/shims:$PATH" bundle exec rspec
    intentional local edits.
 2. Confirm tests with:
    `rtk proxy env PATH="/Users/grillermo/.rbenv/shims:$PATH" bundle exec rspec`.
-3. For Phase 2d, invoke `superpowers:brainstorming` before implementation.
-   Likely design questions:
-   - exact comment data model and polymorphic/page association strategy;
-   - unlimited nesting representation and query shape;
-   - role-gated write/read/moderation behavior;
-   - markdown library and sanitization policy;
-   - upvote/downvote uniqueness and score caching;
-   - email notification opt-in and admin approval links;
-   - moderation UI scope and whether RailsAdmin is sufficient or a custom UI is needed.
-4. Write a Phase 2d spec, then a plan, then execute with review checkpoints.
+3. Phase 2d is complete. Use its committed spec and plan before changing comment
+   behavior or moderation contracts.
 
 ## Warnings
 

@@ -27,9 +27,11 @@
 - Task 1 complete: `944f86f` — dependencies installed and locked.
 - Task 1b complete: `d7b1230` — FactoryBot RSpec configuration and minimal
   user factory added; focused user spec passed (5 examples, 0 failures).
-- Next resume point: run the pending Task 1/1b review gate using
-  `.superpowers/sdd/task-1-brief.md`, `.superpowers/sdd/task-1-report.md`, and
-  `.superpowers/sdd/review-cb852bc..d7b1230.diff`, then begin Task 2.
+- Tasks 2-19 complete: data models, sanitized Markdown, serializer, controllers,
+  mailers, signed approval, RailsAdmin moderation, recursive React thread, and
+  live browser verification are implemented on `main`.
+- Final verification: 98 examples, 0 failures; production client and SSR builds
+  succeeded; desktop/mobile browser workflows completed without console errors.
 
 ---
 
@@ -1828,12 +1830,12 @@ git commit -m "Add comment thread UI to manual sections"
 
 ### Task 19: Whole-suite green + manual browser check
 
-- [ ] **Step 1: Run the full spec suite**
+- [x] **Step 1: Run the full spec suite**
 
 Run: `bundle exec rspec`
 Expected: all green, including the existing manual-content completeness gate.
 
-- [ ] **Step 2: Production builds**
+- [x] **Step 2: Production builds**
 
 Run:
 ```bash
@@ -1842,14 +1844,14 @@ RAILS_ENV=production NODE_ENV=production bin/vite build --ssr
 ```
 Expected: both succeed.
 
-- [ ] **Step 3: Manual browser verification (use superpowers:verification-before-completion)**
+- [x] **Step 3: Manual browser verification (use superpowers:verification-before-completion)**
 
 Start `./serve-dev`, sign in, open a manual section, and confirm: posting a
 comment, replying (nested), hearting/un-hearting, editing own comment, admin
 deleting another user's comment (tombstone), and that the admin approve link
 approves. Note results explicitly before claiming done.
 
-- [ ] **Step 4: Update HANDOFF.md**
+- [x] **Step 4: Update HANDOFF.md**
 
 Mark Phase 2d complete, add the spec/plan rows to the Phase Docs table, and add
 the new files to "Files to Know."
