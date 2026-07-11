@@ -16,6 +16,13 @@ Rails.application.routes.draw do
         defaults: { component: path.join("/") }
   end
 
+  resources :comments, only: [:create, :update, :destroy]
+  post "comments/:comment_id/heart", to: "hearts#create", as: :comment_heart
+
+  namespace :moderation do
+    get "comments/approve/:token", to: "approvals#show", as: :comment_approval
+  end
+
   resources :newsletter_emails, only: [:create]
 
   get "/health", to: "health#show"

@@ -1014,7 +1014,7 @@ git commit -m "Expose section comments prop from ManualController#show"
 **Files:**
 - Modify: `config/routes.rb`
 
-- [ ] **Step 1: Add routes**
+- [x] **Step 1: Add routes**
 
 Insert into `config/routes.rb` (after the manual routes, before `resources :newsletter_emails`):
 
@@ -1041,12 +1041,12 @@ adjust the route to:
   end
 ```
 
-- [ ] **Step 2: Verify routes load**
+- [x] **Step 2: Verify routes load**
 
 Run: `bin/rails routes | grep -E "comment|heart|approval"`
 Expected: routes for `comments#create/update/destroy`, `hearts#create`, `moderation/approvals#show`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add config/routes.rb
