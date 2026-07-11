@@ -184,7 +184,7 @@ git commit -m "Add FactoryBot config and minimal user factory"
 - Create: `app/models/comment.rb`
 - Test: `spec/models/comment_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `spec/models/comment_spec.rb`:
 
@@ -217,12 +217,12 @@ end
 
 The `comment` factory is created in Step 5b below, before the model passes.
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/models/comment_spec.rb`
 Expected: FAIL — uninitialized constant `Comment`.
 
-- [ ] **Step 3: Create the migration**
+- [x] **Step 3: Create the migration**
 
 Create `db/migrate/<ts>_create_comments.rb` (use `rails g migration CreateComments` to get a timestamp, then replace body):
 
@@ -248,12 +248,12 @@ class CreateComments < ActiveRecord::Migration[8.0]
 end
 ```
 
-- [ ] **Step 4: Migrate**
+- [x] **Step 4: Migrate**
 
 Run: `bin/rails db:migrate`
 Expected: `comments` table created; `db/schema.rb` updated (version bumped).
 
-- [ ] **Step 5: Create the model**
+- [x] **Step 5: Create the model**
 
 Create `app/models/comment.rb`:
 
@@ -276,7 +276,7 @@ class Comment < ApplicationRecord
 end
 ```
 
-- [ ] **Step 5b: Create the comment factory**
+- [x] **Step 5b: Create the comment factory**
 
 Create `spec/factories/comments.rb` (minimal valid fields only):
 
@@ -290,12 +290,12 @@ FactoryBot.define do
 end
 ```
 
-- [ ] **Step 6: Run and confirm pass**
+- [x] **Step 6: Run and confirm pass**
 
 Run: `bundle exec rspec spec/models/comment_spec.rb`
 Expected: PASS (4 examples).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add db/migrate db/schema.rb app/models/comment.rb spec/models/comment_spec.rb spec/factories/comments.rb
