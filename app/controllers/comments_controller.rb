@@ -7,7 +7,7 @@ class CommentsController < ApplicationController
 
     if comment.save
       subscribe(comment) if params[:subscribe].present?
-      notify(comment) if defined?(CommentMailer)
+      notify(comment)
       redirect_to section_path_url(comment.section_path)
     else
       redirect_to section_path_url(create_params[:section_path]),

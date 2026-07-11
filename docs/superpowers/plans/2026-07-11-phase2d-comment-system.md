@@ -1435,13 +1435,13 @@ git commit -m "Add HeartsController toggle"
 - Create: `app/views/comment_mailer/admin_notification.html.erb`
 - Test: `spec/mailers/comment_mailer_spec.rb`
 
-- [ ] **Step 1: Confirm mailer defaults**
+- [x] **Step 1: Confirm mailer defaults**
 
 Check `config/environments/production.rb` / `development.rb` for
 `default_url_options` on the mailer host. If absent, add a dev host so URL
 helpers in the mailer render (e.g. `config.action_mailer.default_url_options = { host: "localhost", port: ENV.fetch("RAILS_PORT", 3000) }`). Note this in the commit.
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 Create `spec/mailers/comment_mailer_spec.rb`:
 
@@ -1475,12 +1475,12 @@ RSpec.describe CommentMailer, type: :mailer do
 end
 ```
 
-- [ ] **Step 3: Run and confirm failure**
+- [x] **Step 3: Run and confirm failure**
 
 Run: `bundle exec rspec spec/mailers/comment_mailer_spec.rb`
 Expected: FAIL — no `CommentMailer`.
 
-- [ ] **Step 4: Implement mailer**
+- [x] **Step 4: Implement mailer**
 
 Create `app/mailers/comment_mailer.rb`:
 
@@ -1513,7 +1513,7 @@ Add `moderation_comment_approval_url` — it comes from the Task 10 route. If th
 route helper name differs, run `bin/rails routes | grep approval` and use the
 actual `*_url` helper.
 
-- [ ] **Step 5: Create email views**
+- [x] **Step 5: Create email views**
 
 Create `app/views/comment_mailer/admin_notification.html.erb`:
 
@@ -1533,17 +1533,17 @@ Create `app/views/comment_mailer/reply_notification.html.erb`:
 
 `body_html` is already sanitized by `CommentMarkdown`, so `raw` is safe here.
 
-- [ ] **Step 6: Run and confirm pass**
+- [x] **Step 6: Run and confirm pass**
 
 Run: `bundle exec rspec spec/mailers/comment_mailer_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 7: Un-pend and pass the create enqueue test**
+- [x] **Step 7: Un-pend and pass the create enqueue test**
 
 Run: `bundle exec rspec spec/requests/comments_spec.rb -e "enqueues admin notification"`
 Expected: PASS (remove any `pending` added in Task 11).
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add app/mailers/comment_mailer.rb app/views/comment_mailer config/environments spec/mailers/comment_mailer_spec.rb spec/requests/comments_spec.rb

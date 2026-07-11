@@ -61,12 +61,15 @@ RSpec.describe "Comments", type: :request do
     end
 
     it "enqueues admin notification for the new comment" do
-      pending "CommentMailer is introduced in Task 15"
       sign_in user
+      configured_adapter = ActiveJob::Base.queue_adapter
+      ActiveJob::Base.queue_adapter = :test
 
       expect {
         post "/comments", params: { comment: { section_path: section, body: "hi" } }
       }.to have_enqueued_mail(CommentMailer, :admin_notification)
+    ensure
+      ActiveJob::Base.queue_adapter = configured_adapter if configured_adapter
     end
   end
 
