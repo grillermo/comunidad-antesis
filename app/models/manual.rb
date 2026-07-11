@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "yaml"
-
 # Static table of contents for the ebook "Manual del Color Vivo".
 # No database: the book outline is fixed content, expressed as a tree and
 # turned into explicit routes + React pages. Transcribed from the book's
@@ -150,24 +148,5 @@ module Manual
   # True iff segments is a valid, complete node path.
   def path?(segments)
     !find(segments).nil?
-  end
-
-  # Lazily-loaded slug-path => [start_page, end_page] map, generated offline by
-  # `rake manual:map_pdf_pages` and committed as integers only (no PDF content).
-  # Empty when the file is absent (e.g. before the map has ever been generated).
-  def pdf_page_map
-    @pdf_page_map ||= begin
-      file = Rails.root.join("config/manual_pdf_pages.yml")
-      file.exist? ? (YAML.safe_load_file(file) || {}) : {}
-    end
-  end
-
-  # [start_page, end_page] for a "part/section/..." component path, or nil.
-  # `map:` is injectable for tests; defaults to the committed file.
-  def pdf_page_range(component, map: pdf_page_map)
-    return nil if component.nil? || component.to_s.empty?
-
-    range = map[component.to_s]
-    range && [range.first, range.last]
   end
 end
