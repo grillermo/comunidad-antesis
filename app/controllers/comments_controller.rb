@@ -15,6 +15,14 @@ class CommentsController < ApplicationController
     end
   end
 
+  def update
+    comment = Comment.find(params[:id])
+    return head :forbidden unless can_modify?(comment)
+
+    comment.update!(params.require(:comment).permit(:body))
+    redirect_to section_path_url(comment.section_path)
+  end
+
   private
 
   def create_params
@@ -36,5 +44,9 @@ class CommentsController < ApplicationController
 
   def section_path_url(section)
     "/manual-del-color-vivo/#{section}"
+  end
+
+  def can_modify?(comment)
+    !comment.deleted? && (Current.user.admin? || comment.user_id == Current.user.id)
   end
 end

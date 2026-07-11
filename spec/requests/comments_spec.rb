@@ -69,4 +69,36 @@ RSpec.describe "Comments", type: :request do
       }.to have_enqueued_mail(CommentMailer, :admin_notification)
     end
   end
+
+  describe "PATCH /comments/:id" do
+    let(:other) { create(:user) }
+    let(:admin) { create(:user, :admin) }
+    let!(:comment) { create(:comment, section_path: section, user: user, body: "orig") }
+
+    it "lets the author edit and re-renders body_html" do
+      sign_in user
+
+      patch "/comments/#{comment.id}", params: { comment: { body: "**new**" } }
+
+      expect(comment.reload.body).to eq("**new**")
+      expect(comment.body_html).to include("<strong>new</strong>")
+    end
+
+    it "lets an admin edit any comment" do
+      sign_in admin
+
+      patch "/comments/#{comment.id}", params: { comment: { body: "mod" } }
+
+      expect(comment.reload.body).to eq("mod")
+    end
+
+    it "forbids a non-author non-admin" do
+      sign_in other
+
+      patch "/comments/#{comment.id}", params: { comment: { body: "hack" } }
+
+      expect(response).to have_http_status(:forbidden)
+      expect(comment.reload.body).to eq("orig")
+    end
+  end
 end

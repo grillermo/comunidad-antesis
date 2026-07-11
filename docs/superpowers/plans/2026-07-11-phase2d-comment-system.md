@@ -1207,7 +1207,7 @@ git commit -m "Add CommentsController#create with subscriptions and notification
 - Modify: `app/controllers/comments_controller.rb`
 - Test: `spec/requests/comments_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `spec/requests/comments_spec.rb`:
 
@@ -1239,12 +1239,12 @@ Append to `spec/requests/comments_spec.rb`:
   end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/requests/comments_spec.rb -e "PATCH"`
 Expected: FAIL — no `update` action.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `app/controllers/comments_controller.rb`:
 
@@ -1266,12 +1266,12 @@ Add to the private section:
   end
 ```
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/requests/comments_spec.rb -e "PATCH"`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/controllers/comments_controller.rb spec/requests/comments_spec.rb
