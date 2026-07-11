@@ -649,7 +649,7 @@ git commit -m "Add Heart model with hearts_count counter cache"
 - Modify: `app/models/comment.rb`
 - Test: `spec/models/comment_subscription_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `spec/models/comment_subscription_spec.rb`:
 
@@ -671,12 +671,12 @@ RSpec.describe CommentSubscription, type: :model do
 end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/models/comment_subscription_spec.rb`
 Expected: FAIL — uninitialized constant.
 
-- [ ] **Step 3: Migration**
+- [x] **Step 3: Migration**
 
 ```ruby
 class CreateCommentSubscriptions < ActiveRecord::Migration[8.0]
@@ -693,7 +693,7 @@ end
 
 Run: `bin/rails db:migrate`
 
-- [ ] **Step 4: Models**
+- [x] **Step 4: Models**
 
 Create `app/models/comment_subscription.rb`:
 
@@ -713,7 +713,7 @@ Add to `app/models/comment.rb`:
   has_many :subscribers, through: :comment_subscriptions, source: :user
 ```
 
-- [ ] **Step 4b: CommentSubscription factory**
+- [x] **Step 4b: CommentSubscription factory**
 
 Create `spec/factories/comment_subscriptions.rb`:
 
@@ -726,12 +726,12 @@ FactoryBot.define do
 end
 ```
 
-- [ ] **Step 5: Run and confirm pass**
+- [x] **Step 5: Run and confirm pass**
 
 Run: `bundle exec rspec spec/models/comment_subscription_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add db/migrate db/schema.rb app/models/comment_subscription.rb app/models/comment.rb spec/models/comment_subscription_spec.rb spec/factories/comment_subscriptions.rb

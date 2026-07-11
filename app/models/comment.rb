@@ -5,6 +5,8 @@ class Comment < ApplicationRecord
 
   belongs_to :user
   has_many :hearts, dependent: :destroy
+  has_many :comment_subscriptions, dependent: :destroy
+  has_many :subscribers, through: :comment_subscriptions, source: :user
 
   validates :body, presence: true
   validate :section_path_must_exist

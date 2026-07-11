@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_11_210643) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_11_210722) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "comment_subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "comment_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["comment_id"], name: "index_comment_subscriptions_on_comment_id"
+    t.index ["user_id", "comment_id"], name: "index_comment_subscriptions_on_user_id_and_comment_id", unique: true
+    t.index ["user_id"], name: "index_comment_subscriptions_on_user_id"
+  end
 
   create_table "comments", force: :cascade do |t|
     t.string "section_path", null: false
@@ -197,6 +207,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_11_210643) do
     t.index ["role"], name: "index_users_on_role"
   end
 
+  add_foreign_key "comment_subscriptions", "comments"
+  add_foreign_key "comment_subscriptions", "users"
   add_foreign_key "comments", "users"
   add_foreign_key "hearts", "comments"
   add_foreign_key "hearts", "users"
