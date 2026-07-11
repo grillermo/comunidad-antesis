@@ -45,4 +45,11 @@ RSpec.describe "Manual", type: :request do
     get "/manual-del-color-vivo/does-not-exist"
     expect(response).to have_http_status(:not_found)
   end
+
+  it "never includes a pdfPages prop outside development" do
+    sign_in user
+    get "/manual-del-color-vivo/glosario"
+    page = JSON.parse(Nokogiri::HTML(response.body).at_css("script[data-page]").text)
+    expect(page["props"]).not_to have_key("pdfPages")
+  end
 end
