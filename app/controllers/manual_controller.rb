@@ -18,7 +18,12 @@ class ManualController < InertiaController
     raise ActiveRecord::RecordNotFound unless node
 
     render inertia: "manual-del-color-vivo/#{params[:component]}", props: {
-      title: node[:title]
+      title: node[:title],
+      section: params[:component],
+      comments: CommentTree.new(
+        section_path: params[:component],
+        current_user: Current.user
+      ).as_json
     }
   end
 end

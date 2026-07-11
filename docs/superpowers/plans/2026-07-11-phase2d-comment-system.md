@@ -937,7 +937,7 @@ git commit -m "Add CommentTree serializer for section comment props"
 - Modify: `app/controllers/manual_controller.rb`
 - Test: `spec/requests/manual_comments_spec.rb`
 
-- [ ] **Step 1: Write the failing request test**
+- [x] **Step 1: Write the failing request test**
 
 Create `spec/requests/manual_comments_spec.rb`:
 
@@ -970,12 +970,12 @@ Note: `section` is added to the props at the controller level (see below) so
 the frontend knows where to post. If `<p>hola</p>` differs from Commonmarker's
 exact output, adjust the expectation to `include("hola")`.
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/requests/manual_comments_spec.rb`
 Expected: FAIL — no `comments` prop.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Modify `app/controllers/manual_controller.rb` `#show`:
 
@@ -993,12 +993,12 @@ Modify `app/controllers/manual_controller.rb` `#show`:
   end
 ```
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/requests/manual_comments_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/controllers/manual_controller.rb spec/requests/manual_comments_spec.rb
