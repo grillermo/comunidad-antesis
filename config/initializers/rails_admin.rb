@@ -12,6 +12,27 @@ RailsAdmin.config do |config|
   end
   config.current_user_method(&:current_user)
 
+  config.model "Comment" do
+    list do
+      field :id
+      field :section_path
+      field :user
+      field :body
+      field :hearts_count
+      field :sticky
+      field :approved
+      field :deleted_at
+      field :created_at
+    end
+
+    edit do
+      field :body
+      field :sticky
+      field :approved
+      field :deleted_at
+    end
+  end
+
   config.actions do
     dashboard
     index

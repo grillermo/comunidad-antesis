@@ -26,4 +26,14 @@ RSpec.describe "RailsAdmin access", type: :request do
     expect(response).to have_http_status(:ok)
     expect(response.body).not_to match(/translation missing/i)
   end
+
+  it "lists comments for an admin" do
+    admin = create(:user, :admin)
+    create(:comment, user: admin)
+    sign_in admin
+
+    get "/antesis-admin/comment"
+
+    expect(response).to have_http_status(:ok)
+  end
 end

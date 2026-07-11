@@ -1666,7 +1666,7 @@ git commit -m "Add signed-token comment approval endpoint"
 - Modify: `config/initializers/rails_admin.rb`
 - Test: `spec/requests/rails_admin_access_spec.rb` (extend)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `spec/requests/rails_admin_access_spec.rb` an admin-only check that the
 Comment admin list loads:
@@ -1681,13 +1681,13 @@ Comment admin list loads:
   end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/requests/rails_admin_access_spec.rb -e "lists comments"`
 Expected: FAIL (model not registered / label config missing) or PASS trivially —
 if it passes without config, still add config in Step 3 for the moderation UX.
 
-- [ ] **Step 3: Register the model**
+- [x] **Step 3: Register the model**
 
 Add to `config/initializers/rails_admin.rb` inside the `RailsAdmin.config` block:
 
@@ -1713,12 +1713,12 @@ Add to `config/initializers/rails_admin.rb` inside the `RailsAdmin.config` block
   end
 ```
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/requests/rails_admin_access_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add config/initializers/rails_admin.rb spec/requests/rails_admin_access_spec.rb
