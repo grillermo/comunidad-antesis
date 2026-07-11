@@ -37,6 +37,7 @@ class CommentTree
     {
       id: comment.id,
       author: comment.deleted? ? nil : comment.user.email,
+      body: can_edit?(comment) ? comment.body : nil,
       body_html: comment.display_body_html,
       hearts_count: comment.hearts_count,
       hearted: @hearted_ids.include?(comment.id),

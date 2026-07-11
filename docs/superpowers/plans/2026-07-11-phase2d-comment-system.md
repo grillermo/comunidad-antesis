@@ -1742,7 +1742,7 @@ Follow the app's Inertia + React conventions from
 `@inertiajs/react`). Reuse the Tailwind v4 `@theme` palette in
 `app/frontend/entrypoints/application.css`.
 
-- [ ] **Step 1: CommentForm**
+- [x] **Step 1: CommentForm**
 
 Create `app/frontend/components/comments/CommentForm.jsx` — a compose box that
 posts to `/comments` with `section`, `body`, optional `parent_id`, and a
@@ -1784,7 +1784,7 @@ export default function CommentForm({ section, parentId = null, onDone }) {
 }
 ```
 
-- [ ] **Step 2: CommentNode**
+- [x] **Step 2: CommentNode**
 
 Create `app/frontend/components/comments/CommentNode.jsx` — renders one comment
 and its replies recursively: author, relative time, `dangerouslySetInnerHTML`
@@ -1794,20 +1794,20 @@ by `can_edit`/`can_delete`. Sticky and approve controls remain in RailsAdmin;
 do not add a custom Inertia moderation UI. Deleted nodes render the tombstone
 body and hide actions. Recurse over `replies` with visual indentation.
 
-- [ ] **Step 3: CommentThread**
+- [x] **Step 3: CommentThread**
 
 Create `app/frontend/components/comments/CommentThread.jsx` — takes `comments`
 and `section` props, renders a top-level `CommentForm` and maps roots to
 `CommentNode`.
 
-- [ ] **Step 4: Mount in ManualLayout**
+- [x] **Step 4: Mount in ManualLayout**
 
 Modify `app/frontend/components/ManualLayout.jsx` to render `<CommentThread
 comments={comments} section={section} />` at the bottom of the content when
 those props are present (index page has none). Read `comments`/`section` from
 the page props passed to the layout.
 
-- [ ] **Step 5: Build to verify no errors**
+- [x] **Step 5: Build to verify no errors**
 
 Run: `bin/vite build --clear`
 Expected: client build succeeds.
@@ -1815,7 +1815,7 @@ Expected: client build succeeds.
 Run: `RAILS_ENV=production NODE_ENV=production bin/vite build --ssr`
 Expected: SSR build succeeds.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app/frontend/components/comments app/frontend/components/ManualLayout.jsx

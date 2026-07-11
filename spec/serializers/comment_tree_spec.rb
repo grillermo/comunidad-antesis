@@ -29,10 +29,12 @@ RSpec.describe CommentTree do
     expect(as_viewer[:hearted]).to be(true)
     expect(as_viewer[:can_edit]).to be(false)
     expect(as_viewer[:can_delete]).to be(false)
+    expect(as_viewer[:body]).to be_nil
 
     as_author = described_class.new(section_path: section, current_user: author).as_json.first
     expect(as_author[:can_edit]).to be(true)
     expect(as_author[:can_delete]).to be(true)
+    expect(as_author[:body]).to eq(comment.body)
 
     as_admin = described_class.new(section_path: section, current_user: admin).as_json.first
     expect(as_admin[:can_delete]).to be(true)
