@@ -1061,7 +1061,7 @@ git commit -m "Add routes for comments, hearts, and comment approval"
 - Create: `app/controllers/comments_controller.rb`
 - Test: `spec/requests/comments_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `spec/requests/comments_spec.rb`:
 
@@ -1129,13 +1129,13 @@ ActiveJob, and `deliver_later` enqueues a mail job. If the matcher does not see
 the job, assert on `enqueued_jobs` or set `ActiveJob::Base.queue_adapter = :test`
 in a `before`. Confirm the app's test job adapter in `config/environments/test.rb`.
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/requests/comments_spec.rb -e "POST /comments"`
 Expected: FAIL — no `CommentsController`. (The admin-notification example also
 needs Task 15's mailer; leave it failing until then or `pending` it.)
 
-- [ ] **Step 3: Implement create**
+- [x] **Step 3: Implement create**
 
 Create `app/controllers/comments_controller.rb`:
 
@@ -1187,12 +1187,12 @@ If returning a bare `422` breaks the Inertia flow, mirror the pattern in
 `app/controllers/users/sessions_controller.rb` for failed-submit handling.
 Verify against that controller before finalizing.
 
-- [ ] **Step 4: Run and confirm pass (create + subscribe + reject)**
+- [x] **Step 4: Run and confirm pass (create + subscribe + reject)**
 
 Run: `bundle exec rspec spec/requests/comments_spec.rb -e "POST /comments" -e "creates" -e "subscription" -e "rejects"`
 Expected: PASS (admin-notification example still pending until Task 15).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/controllers/comments_controller.rb spec/requests/comments_spec.rb
