@@ -442,7 +442,7 @@ git commit -m "Render and sanitize comment Markdown into cached body_html"
 - Modify: `app/models/comment.rb`
 - Test: `spec/models/comment_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `spec/models/comment_spec.rb`:
 
@@ -481,12 +481,12 @@ Append to `spec/models/comment_spec.rb`:
   end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/models/comment_spec.rb -e "soft delete"`
 Expected: FAIL — no `soft_delete!`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `app/models/comment.rb`:
 
@@ -522,12 +522,12 @@ Add to `app/models/comment.rb`:
   end
 ```
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/models/comment_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/models/comment.rb spec/models/comment_spec.rb
