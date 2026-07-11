@@ -22,4 +22,10 @@ RSpec.describe Comment, type: :model do
     expect(reply.parent).to eq(parent)
     expect(parent.children).to include(reply)
   end
+
+  it "caches sanitized body_html on save" do
+    comment = create(:comment, body: "**hi**")
+
+    expect(comment.body_html).to include("<strong>hi</strong>")
+  end
 end

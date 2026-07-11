@@ -311,7 +311,7 @@ git commit -m "Add Comment model with ancestry and section validation"
 - Test: `spec/services/comment_markdown_spec.rb`
 - Modify: `app/models/comment.rb`
 
-- [ ] **Step 1: Write the failing service test**
+- [x] **Step 1: Write the failing service test**
 
 Create `spec/services/comment_markdown_spec.rb`:
 
@@ -348,12 +348,12 @@ RSpec.describe CommentMarkdown do
 end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/services/comment_markdown_spec.rb`
 Expected: FAIL — uninitialized constant `CommentMarkdown`.
 
-- [ ] **Step 3: Implement the service**
+- [x] **Step 3: Implement the service**
 
 Create `app/services/comment_markdown.rb`:
 
@@ -390,12 +390,12 @@ Note: Rails' `sanitize` drops `javascript:`/unsafe schemes and event-handler
 attributes by default once the allowlist excludes them. `tagfilter` neutralizes
 raw HTML tags like `<script>` inside Markdown.
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/services/comment_markdown_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 5: Wire rendering into the model**
+- [x] **Step 5: Wire rendering into the model**
 
 Add to `app/models/comment.rb` (inside the class, after validations):
 
@@ -411,7 +411,7 @@ Add to `app/models/comment.rb` (inside the class, after validations):
 
 (Keep the existing `section_path_must_exist` private method below.)
 
-- [ ] **Step 6: Add a model test for caching**
+- [x] **Step 6: Add a model test for caching**
 
 Append to `spec/models/comment_spec.rb`:
 
@@ -422,12 +422,12 @@ Append to `spec/models/comment_spec.rb`:
   end
 ```
 
-- [ ] **Step 7: Run and confirm pass**
+- [x] **Step 7: Run and confirm pass**
 
 Run: `bundle exec rspec spec/models/comment_spec.rb spec/services/comment_markdown_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add app/services/comment_markdown.rb spec/services/comment_markdown_spec.rb app/models/comment.rb spec/models/comment_spec.rb
