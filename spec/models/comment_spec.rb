@@ -63,4 +63,12 @@ RSpec.describe Comment, type: :model do
     other_parent = create(:comment, section_path: "color-sobre-fibra/guia-de-lavado")
     expect(build(:comment, parent: other_parent)).not_to be_valid
   end
+
+  it "allows a preserved reply to be updated after its parent is deleted" do
+    parent = create(:comment)
+    reply = create(:comment, parent: parent)
+    parent.soft_delete!
+
+    expect { reply.update!(approved: true) }.not_to raise_error
+  end
 end

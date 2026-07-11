@@ -45,6 +45,7 @@ class Comment < ApplicationRecord
 
   def parent_must_be_active_and_in_same_section
     return unless parent
+    return unless new_record? || will_save_change_to_ancestry? || will_save_change_to_section_path?
 
     errors.add(:parent, "is deleted") if parent.deleted?
     errors.add(:parent, "belongs to another section") if parent.section_path != section_path
