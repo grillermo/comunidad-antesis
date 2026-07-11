@@ -797,7 +797,7 @@ git commit -m "Associate User with comments, hearts, and subscriptions"
 - Create: `app/serializers/comment_tree.rb`
 - Test: `spec/serializers/comment_tree_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `spec/serializers/comment_tree_spec.rb`:
 
@@ -852,12 +852,12 @@ RSpec.describe CommentTree do
 end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/serializers/comment_tree_spec.rb`
 Expected: FAIL — uninitialized constant `CommentTree`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `app/serializers/comment_tree.rb`:
 
@@ -917,12 +917,12 @@ class CommentTree
 end
 ```
 
-- [ ] **Step 4: Run and confirm pass**
+- [x] **Step 4: Run and confirm pass**
 
 Run: `bundle exec rspec spec/serializers/comment_tree_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/serializers/comment_tree.rb spec/serializers/comment_tree_spec.rb
