@@ -21,6 +21,16 @@
   error page.
 - Signed approval tokens consistently use purpose `:approve`.
 
+## Execution progress
+
+- Baseline: 53 examples, 0 failures at `cb852bc`.
+- Task 1 complete: `944f86f` — dependencies installed and locked.
+- Task 1b complete: `d7b1230` — FactoryBot RSpec configuration and minimal
+  user factory added; focused user spec passed (5 examples, 0 failures).
+- Next resume point: run the pending Task 1/1b review gate using
+  `.superpowers/sdd/task-1-brief.md`, `.superpowers/sdd/task-1-report.md`, and
+  `.superpowers/sdd/review-cb852bc..d7b1230.diff`, then begin Task 2.
+
 ---
 
 ## Naming reconciliation
@@ -79,7 +89,7 @@ no worktree/branch per prior phases).
 **Files:**
 - Modify: `Gemfile`
 
-- [ ] **Step 1: Add gems**
+- [x] **Step 1: Add gems**
 
 Add to `Gemfile` (top-level runtime gems, near `devise`):
 
@@ -97,12 +107,12 @@ group :development, :test do
 end
 ```
 
-- [ ] **Step 2: Install**
+- [x] **Step 2: Install**
 
 Run: `bundle install`
 Expected: bundle completes; `Gemfile.lock` gains `ancestry`, `commonmarker`, and `factory_bot_rails`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add Gemfile Gemfile.lock
@@ -122,7 +132,7 @@ exist before the `comments` table). Create the config + `user` factory now; add
 the others in the model tasks that introduce them. Each factory carries only the
 minimal fields required to pass validations — no extra attributes.
 
-- [ ] **Step 1: FactoryBot syntax config**
+- [x] **Step 1: FactoryBot syntax config**
 
 Create `spec/support/factory_bot.rb`:
 
@@ -136,7 +146,7 @@ end
 bare `build`/`create` syntax; it is required automatically via the existing
 `spec/support/**/*.rb` glob in `rails_helper.rb`.)
 
-- [ ] **Step 2: User factory**
+- [x] **Step 2: User factory**
 
 Create `spec/factories/users.rb`:
 
@@ -153,12 +163,12 @@ FactoryBot.define do
 end
 ```
 
-- [ ] **Step 3: Sanity check**
+- [x] **Step 3: Sanity check**
 
 Run: `bundle exec rspec spec/models/user_spec.rb`
 Expected: still PASS (existing examples untouched; factory unused yet).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add spec/support/factory_bot.rb spec/factories/users.rb
