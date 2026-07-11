@@ -1,4 +1,5 @@
 import ManualLayout from '@/components/ManualLayout'
+import { MaterialList, Material } from '@/components/manual/MaterialList'
 import Recipe from '@/components/manual/Recipe'
 import Steps from '@/components/manual/Steps'
 import SideNote from '@/components/manual/SideNote'
@@ -10,15 +11,16 @@ export default function Page({ title }) {
       <p>Las flores del árbol y la piel de sus frutos tienen un alto contenido en taninos complejos, lo cual lo hace un tinte directo que puede usarse para teñir sin mordiente. Su uso como tinte más antiguo data del período neobabilónico y ha sido utilizado para teñir durante milenios.</p>
       <p>Se pueden obtener amarillos cálidos, y con la ayuda de modificadores también grises y marrones.</p>
       <p>Aunque no requiere mordiente, yo prefiero mordentar antes para fijar todas las moléculas tintóreas que contiene. Como la granada es ya alta en taninos, omito el pretratamiento con ácido tánico. Si quieres llegar al gris, puedes agregar sulfato ferroso al tinte o aplicarlo en un baño posterior.</p>
-      <pre className="overflow-x-auto whitespace-pre font-body text-sm leading-6">Materiales
-         •   Camiseta 100% algodón             •   100 gramos de cáscara de
-             (pesa aproximadamente 100             granada seca
-             gramos)                               (200 g si está fresca)</pre>
-      <pre className="overflow-x-auto whitespace-pre font-body text-sm leading-6">•   Jabón                             •   Olla</pre>
-      <pre className="overflow-x-auto whitespace-pre font-body text-sm leading-6">•   10 gramos de alumbre              •   Agua
-             potásico
-             o acetato de aluminio             •   Fuente de calor</pre>
-      <Recipe rendimiento={""} tiempo={"4 horas aproximadamente, 60 minutos activos."}>
+      <MaterialList>
+        <Material term="Camiseta 100% algodón (pesa aproximadamente 100 gramos)" />
+        <Material term="100 gramos de cáscara de granada seca (200 g si está fresca)" />
+        <Material term="Jabón" />
+        <Material term="Olla" />
+        <Material term="10 gramos de alumbre potásico o acetato de aluminio" />
+        <Material term="Agua" />
+        <Material term="Fuente de calor" />
+      </MaterialList>
+      <Recipe tiempo="4 horas aproximadamente, 60 minutos activos.">
         <Steps>
           <li>Lava la camiseta con agua tibia y jabón.</li>
           <li>Llena la olla con suficiente agua para que la camiseta quede cubierta y pueda moverse libremente. Ponla a fuego bajo y agrega el alumbre o el acetato de aluminio. Mezcla hasta disolverlo.</li>

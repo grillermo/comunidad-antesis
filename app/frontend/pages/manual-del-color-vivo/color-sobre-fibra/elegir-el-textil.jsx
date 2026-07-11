@@ -20,7 +20,7 @@ export default function Page({ title }) {
       <p>Vestido Lyocell de Vegetal 250 g bambú 100%</p>
       <p>Funda de Cáñamo 100% Vegetal 400 g almohada</p>
       <p>Suéter Lana 70% Proteína 300 g Algodón 30% y vegetal</p>
-      <Callout><p>cada fibra reacciona distinto con el calor. La lana y la seda no toleran más de 80-85°C, si hierven, se dañan y pierden brillo. El algodón, el lino y el cáñamo aguantan hasta el hervor. El lyocell aguanta hasta 60°C, pero prefiero trabajarlo en frío junto con los suéteres de cualquier material: el calor, sumado a la agitación y a los cambios bruscos de temperatura los encoge y los deforma con mucha facilidad. Ajusta la flama y la técnica según la fibra con la que trabajes.</p></Callout>
+      <Callout><p>Cada fibra reacciona distinto con el calor. La lana y la seda no toleran más de 80-85°C, si hierven, se dañan y pierden brillo. El algodón, el lino y el cáñamo aguantan hasta el hervor. El lyocell aguanta hasta 60°C, pero prefiero trabajarlo en frío junto con los suéteres de cualquier material: el calor, sumado a la agitación y a los cambios bruscos de temperatura los encoge y los deforma con mucha facilidad. Ajusta la flama y la técnica según la fibra con la que trabajes.</p></Callout>
     </ManualLayout>
   )
 }

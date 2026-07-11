@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manual del Color Vivo — páginas corregidas (13 &lt;pre&gt; dumps)</title>
+<style>
+  :root {
+    --cream: #F5EFDA;
+    --blue: #33538C;
+    --blue-ink: #2A3F6B;
+    --orange: #EF6C15;
+    --orange-ink: #E5620C;
+  }
+  body {
+    font-family: -apple-system, "Nunito Sans", ui-sans-serif, sans-serif;
+    background: var(--cream);
+    color: var(--blue-ink);
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+    line-height: 1.55;
+  }
+  h1 { font-size: 1.5rem; color: var(--blue); margin-bottom: 0.25rem; }
+  .subtitle { opacity: 0.75; margin-bottom: 1.5rem; font-size: 0.92rem; }
+  .meta {
+    background: white;
+    border-left: 4px solid var(--orange);
+    padding: 0.85rem 1.1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    font-size: 0.88rem;
+  }
+  ol { padding-left: 1.3rem; }
+  li { margin-bottom: 0.6rem; }
+  .card {
+    background: white;
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .card a.page-link {
+    color: var(--orange-ink);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .card a.page-link:hover { text-decoration: underline; }
+  .card .path {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    color: var(--blue-ink);
+    opacity: 0.6;
+    margin-top: 0.15rem;
+  }
+  .card .badge {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: #2E7D32;
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .baseurl {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    background: #f0ead6;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Manual del Color Vivo — páginas corregidas</h1>
+<div class="subtitle">13 páginas que dumpeaban ASCII crudo en &lt;pre&gt; ahora recompuestas con Recipe/Steps/MaterialList/Table</div>
+
+<div class="meta">
+  Servidor local: <span class="baseurl">http://localhost:3000</span> (ajusta si usas otro puerto). Rutas requieren sesión autenticada — inicia sesión primero o los links redirigirán a login.
+</div>
+
+<ol>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tinta-textil" target="_blank" rel="noopener">Tinta textil</a>
+      <div class="path">color-sobre-fibra/tinta-textil</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/impresion-botanica" target="_blank" rel="noopener">Impresión botánica</a>
+      <div class="path">color-sobre-fibra/impresion-botanica</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/hapa-zome" target="_blank" rel="noopener">Hapa zome</a>
+      <div class="path">color-sobre-fibra/hapa-zome</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/modificadores-y-tratamientos-de-color" target="_blank" rel="noopener">Modificadores y tratamientos de color</a>
+      <div class="path">color-sobre-fibra/modificadores-y-tratamientos-de-color</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-mordentado/receta-para-mordentar" target="_blank" rel="noopener">Receta para mordentar</a>
+      <div class="path">color-sobre-fibra/guia-de-mordentado/receta-para-mordentar</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-indigo/receta-de-tinte-de-indigo-con-fructosa" target="_blank" rel="noopener">Receta de tinte de índigo con fructosa</a>
+      <div class="path">color-sobre-fibra/tenir-con-indigo/receta-de-tinte-de-indigo-con-fructosa</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-indigo/receta-de-tinte-de-indigo-con-sulfato-ferroso" target="_blank" rel="noopener">Receta de tinte de índigo con sulfato ferroso</a>
+      <div class="path">color-sobre-fibra/tenir-con-indigo/receta-de-tinte-de-indigo-con-sulfato-ferroso</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-plantas/receta-general-para-tenir-con-plantas" target="_blank" rel="noopener">Receta general para teñir con plantas</a>
+      <div class="path">color-sobre-fibra/tenir-con-plantas/receta-general-para-tenir-con-plantas</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-palo-de-campeche" target="_blank" rel="noopener">Receta para teñir con palo de Campeche</a>
+      <div class="path">color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-palo-de-campeche</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-rubia" target="_blank" rel="noopener">Receta para teñir con rubia</a>
+      <div class="path">color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-rubia</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-cascara-de-granada" target="_blank" rel="noopener">Receta para teñir con cáscara de granada</a>
+      <div class="path">color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-cascara-de-granada</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/pigmento-y-polvo/pigmentos-de-laca" target="_blank" rel="noopener">Pigmentos de laca</a>
+      <div class="path">pigmento-y-polvo/pigmentos-de-laca</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-cotidiano/envoltorios-de-cera-de-abeja" target="_blank" rel="noopener">Envoltorios de cera de abeja</a>
+      <div class="path">color-cotidiano/envoltorios-de-cera-de-abeja</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+</ol>
+
+</body>
+</html>

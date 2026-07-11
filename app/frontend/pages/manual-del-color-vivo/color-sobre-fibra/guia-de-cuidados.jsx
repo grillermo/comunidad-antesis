@@ -11,12 +11,14 @@ export default function Page({ title }) {
       <p>Crear algo teñido con la naturaleza está del otro lado: te enseña a abrazar esa falta de control, a dejarse llevar y crear junto con algo más grande que tu, y confiar en ese ciclo. Cuando un proyecto sale mal, o reconoces que una fibra ya no puede rescatarse, también se te pide abrazar épocas que son desordenadas, donde hay descomposición, donde hay invierno, donde hay vacío. No como efecto secundario, sino como algo necesario, un requisito para que exista la vida. Tener la posibilidad de enterrar aquellas prendas viejas y experimentos fallidos</p>
       <p>nos libera de aquello que habríamos exiliado como oscuro, sombrío, podrido o indeseable, y nos deja reconocerlo como una necesidad, un requisito, una composta que lleva a tierra fértil.</p>
       <p>Aun así, mientras sean útiles debemos cuidarlas. Con las siguientes recomendaciones, es completamente posible que las piezas teñidas te acompañen más tiempo:</p>
-      <ul className="list-disc space-y-3 pl-6 marker:text-orange"><li>Lava a máquina o a mano con agua fría y colores similares.</li></ul>
-      <ul className="list-disc space-y-3 pl-6 marker:text-orange"><li>Utiliza jabón neutro o suave y disuelve con agua antes de aplicarlo a la tela, nunca lo pongas directo.</li></ul>
-      <ul className="list-disc space-y-3 pl-6 marker:text-orange"><li>Tiende a la sombra y evita la exposición de luz solar directa constante.</li></ul>
-      <ul className="list-disc space-y-3 pl-6 marker:text-orange"><li>No laves en seco.</li></ul>
-      <ul className="list-disc space-y-3 pl-6 marker:text-orange"><li>Si el color cambia mucho o ya no te gusta, tiñe la prenda otra vez. Si ya la mordentaste alguna vez, no necesitas volver a hacerlo y puedes utilizar otro colorante.</li></ul>
-      <ul className="list-disc space-y-3 pl-6 marker:text-orange"><li>Cuando un textil ya no te sirva, considera que si está hecho de fibras 100 % naturales (algodón, lino, lana, cáñamo, seda) y no tiene estampados de plástico, puede compostarse. Córtalo en pedacitos pequeños, retira piezas metálicas e hilos sintéticos y devuélvelo a la tierra. Cerrar el ciclo también es parte del proceso.</li></ul>
+      <ul className="list-disc space-y-3 pl-6 marker:text-orange">
+        <li>Lava a máquina o a mano con agua fría y colores similares.</li>
+        <li>Utiliza jabón neutro o suave y disuelve con agua antes de aplicarlo a la tela, nunca lo pongas directo.</li>
+        <li>Tiende a la sombra y evita la exposición de luz solar directa constante.</li>
+        <li>No laves en seco.</li>
+        <li>Si el color cambia mucho o ya no te gusta, tiñe la prenda otra vez. Si ya la mordentaste alguna vez, no necesitas volver a hacerlo y puedes utilizar otro colorante.</li>
+        <li>Cuando un textil ya no te sirva, considera que si está hecho de fibras 100 % naturales (algodón, lino, lana, cáñamo, seda) y no tiene estampados de plástico, puede compostarse. Córtalo en pedacitos pequeños, retira piezas metálicas e hilos sintéticos y devuélvelo a la tierra. Cerrar el ciclo también es parte del proceso.</li>
+      </ul>
     </ManualLayout>
   )
 }

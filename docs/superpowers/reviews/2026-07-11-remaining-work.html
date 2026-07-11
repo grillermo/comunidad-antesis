@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manual del Color Vivo — trabajo pendiente de fidelidad de contenido</title>
+<style>
+  :root {
+    --cream: #F5EFDA;
+    --blue: #33538C;
+    --blue-ink: #2A3F6B;
+    --orange: #EF6C15;
+    --orange-ink: #E5620C;
+    --green: #2E7D32;
+  }
+  body {
+    font-family: -apple-system, "Nunito Sans", ui-sans-serif, sans-serif;
+    background: var(--cream);
+    color: var(--blue-ink);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+    line-height: 1.55;
+  }
+  h1 { font-size: 1.5rem; color: var(--blue); margin-bottom: 0.25rem; }
+  h2 {
+    font-size: 1.1rem;
+    color: var(--blue);
+    margin-top: 2.5rem;
+    margin-bottom: 0.4rem;
+    border-bottom: 2px solid var(--orange);
+    padding-bottom: 0.3rem;
+  }
+  h3 { font-size: 0.95rem; color: var(--blue-ink); margin-top: 1.5rem; }
+  .subtitle { opacity: 0.75; margin-bottom: 1.5rem; font-size: 0.92rem; }
+  .meta {
+    background: white;
+    border-left: 4px solid var(--orange);
+    padding: 0.85rem 1.1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    font-size: 0.88rem;
+  }
+  .prose { font-size: 0.9rem; margin-bottom: 1rem; }
+  ul.items { list-style: none; padding-left: 0; }
+  ul.items li {
+    background: white;
+    border-radius: 6px;
+    padding: 0.65rem 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-size: 0.88rem;
+  }
+  ul.items li.done { opacity: 0.85; }
+  .status {
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 0.1rem;
+  }
+  .status.done { background: var(--green); }
+  .status.open { background: #999; }
+  .status.low { background: var(--blue); }
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    background: #f0ead6;
+    padding: 0.05rem 0.35rem;
+    border-radius: 3px;
+  }
+  a.file-link {
+    color: var(--orange-ink);
+    text-decoration: none;
+  }
+  a.file-link:hover { text-decoration: underline; }
+  .baseurl {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    background: #f0ead6;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+  .note { display: block; opacity: 0.75; margin-top: 0.25rem; font-size: 0.83rem; }
+  .footnote {
+    background: white;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 0.83rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  ol.verify { padding-left: 1.3rem; font-size: 0.88rem; }
+  ol.verify li { margin-bottom: 0.5rem; }
+  .badge-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: var(--orange-ink);
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .badge-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<h1>Manual del Color Vivo — trabajo pendiente de fidelidad de contenido</h1>
+<div class="subtitle">Tracking doc del review en <code>2026-07-11-manual-content-review.html</code></div>
+
+<div class="meta">
+  Los 13 <code>&lt;pre&gt;</code>-dumps ya están resueltos (ver
+  <code>2026-07-11-fixed-pages-links.html</code>). Este doc cubre lo que
+  quedaba: finding 5 (listas fragmentadas) y finding 3 (párrafos partidos) de
+  ese review. Conteos re-verificados el 2026-07-11 después de los fixes de
+  <code>&lt;pre&gt;</code> — algunos archivos del review original ya estaban
+  resueltos como efecto colateral, y algunas líneas marcadas resultaron ser
+  falsos positivos.
+</div>
+
+<div class="meta">
+  Servidor local: <span class="baseurl">http://localhost:3000</span> (ajusta
+  si usas otro puerto). Rutas requieren sesión autenticada — inicia sesión
+  primero o los links redirigirán a login. Cada <code>&lt;code&gt;</code> de
+  archivo de abajo es un link a la página real en el manual.
+</div>
+
+<h2>1. Listas fragmentadas — un <code>&lt;ul&gt;</code> por <code>&lt;li&gt;</code> en vez de una sola lista</h2>
+<div class="prose">
+  Detectado vía <code>ul</code> count == <code>li</code> count (cada lista
+  tenía exactamente un ítem). Se agruparon en un solo
+  <code>&lt;ul className="list-disc space-y-4 pl-6 marker:text-orange"&gt;</code>
+  por grupo lógico, o en <code>&lt;MaterialList&gt;/&lt;Material&gt;</code>
+  donde los ítems tenían forma término-en-negrita + guion largo.
+</div>
+
+<ul class="items">
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/retenido" target="_blank" rel="noopener"><code>color-sobre-fibra/retenido.jsx</code></a> — 11 <code>&lt;ul&gt;</code> fragmentados
+      <span class="note">→ 2 listas (3 + 8 ítems)</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div><a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/consejos-para-tenir-ropa" target="_blank" rel="noopener"><code>color-sobre-fibra/consejos-para-tenir-ropa.jsx</code></a> — 7</div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-lavado" target="_blank" rel="noopener"><code>color-sobre-fibra/guia-de-lavado.jsx</code></a> — 7
+      <span class="note">también unió una oración partida a mitad de ítem ("hebras no" / "se separen, pero...")</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-tenido" target="_blank" rel="noopener"><code>color-sobre-fibra/guia-de-tenido.jsx</code></a> — 8
+      <span class="note">→ convertida a <code>MaterialList</code>/<code>Material</code></span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-indigo/resolucion-de-problemas-al-tenir-con-indigo" target="_blank" rel="noopener"><code>color-sobre-fibra/tenir-con-indigo/resolucion-de-problemas-al-tenir-con-indigo.jsx</code></a> — 7
+      <span class="note">primer ítem era texto de introducción, movido a &lt;p&gt; suelto antes de la lista; también unió una oración partida a mitad de ítem ("Si" / "persiste, agrega...")</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div><a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-cuidados" target="_blank" rel="noopener"><code>color-sobre-fibra/guia-de-cuidados.jsx</code></a> — 6</div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-en-movimiento/recomendaciones-generales" target="_blank" rel="noopener"><code>color-en-movimiento/recomendaciones-generales.jsx</code></a> — 4
+      <span class="note">también unió una oración partida a mitad de ítem ("estas" / "preparaciones son puntos de partida...")</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div><a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-plantas/recomendaciones-antes-de-tenir" target="_blank" rel="noopener"><code>color-sobre-fibra/tenir-con-plantas/recomendaciones-antes-de-tenir.jsx</code></a> — 3</div>
+  </li>
+</ul>
+
+<div class="footnote">
+  Los 8 archivos quedaron resueltos el 2026-07-11. <code>bin/vite build</code>
+  sale con exit 0 (solo ruido pre-existente de deprecación de Sass de
+  Bootstrap, no relacionado). Links de verificación:
+  <a class="badge-link" href="2026-07-11-fragmented-lists-links.html">2026-07-11-fragmented-lists-links.html</a>
+</div>
+
+<div class="footnote">
+  No es bug: <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/el-origen-del-color/medidas-de-seguridad" target="_blank" rel="noopener"><code>el-origen-del-color/medidas-de-seguridad.jsx</code></a> tiene 3
+  <code>&lt;ul&gt;</code> pero 12 <code>&lt;li&gt;</code> en total (agrupados
+  correctamente bajo 3 secciones <code>&lt;Subheading&gt;</code>) — ya está
+  bien, sin acción.
+</div>
+
+<h2>2. Oraciones partidas entre <code>&lt;p&gt;</code> en los saltos de línea del PDF</h2>
+<div class="prose">
+  Detectado vía párrafos que empiezan con minúscula. <strong>Verificar cada
+  uno contra el PDF antes de unir</strong> — algunos inicios en minúscula son
+  intencionales (ver falsos positivos abajo), así que no unir a ciegas.
+</div>
+
+<ul class="items">
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-indigo" target="_blank" rel="noopener"><code>color-sobre-fibra/tenir-con-indigo.jsx</code></a>
+      <span class="note">verificado contra PDF: split real ("...queda atrapado dentro" / "de la fibra...") unido 2026-07-11</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-grana-cochinilla" target="_blank" rel="noopener"><code>color-sobre-fibra/tenir-con-grana-cochinilla.jsx</code></a>
+      <span class="note">verificado contra PDF: split real ("...o transformarse" / "en pigmento insoluble...") unido 2026-07-11</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-cuidados" target="_blank" rel="noopener"><code>color-sobre-fibra/guia-de-cuidados.jsx</code></a>
+      <span class="note">listas fragmentadas arregladas 2026-07-11; sin split de párrafo real en este archivo tras re-revisión, era falso positivo</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-indigo/pasta-de-resistencia-para-indigo" target="_blank" rel="noopener"><code>color-sobre-fibra/tenir-con-indigo/pasta-de-resistencia-para-indigo.jsx</code></a>
+      <span class="note">verificado contra PDF: split real ("...patrones geométricos" / "o abstractos...") unido 2026-07-11</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-indigo/resolucion-de-problemas-al-tenir-con-indigo" target="_blank" rel="noopener"><code>color-sobre-fibra/tenir-con-indigo/resolucion-de-problemas-al-tenir-con-indigo.jsx</code></a>
+      <span class="note">listas fragmentadas arregladas 2026-07-11, y su único split a mitad de lista ("baño está demasiado reducido... Si" / "persiste, agrega...") se unió al mismo tiempo</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-cotidiano/tinta-botanica" target="_blank" rel="noopener"><code>color-cotidiano/tinta-botanica.jsx</code></a>
+      <span class="note">verificado contra PDF: split real ("...no son muy resistentes a la luz;" / "son ideales para ilustración...") unido 2026-07-11. Bug aparte hallado y NO corregido (fuera de alcance de este finding): paso 1 de la receta tiene texto OCR corrupto "remojanconcentrada. do por 24 horas" — debería ser "remojando por 24 horas" (la etiqueta lateral "200 ml de tinta concentrada" se coló en el paso)</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-en-movimiento/pintura-textil" target="_blank" rel="noopener"><code>color-en-movimiento/pintura-textil.jsx</code></a>
+      <span class="note">verificado contra PDF: split real ("...Está basada en la técnica" / "japonesa gōjiru...") unido 2026-07-11. Bug aparte hallado y NO corregido (mismo patrón que tinta-botanica.jsx): paso 1 tiene "enconde trabajo activo. trar" — debería ser "encontrar"</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-lavado" target="_blank" rel="noopener"><code>color-sobre-fibra/guia-de-lavado.jsx</code></a>
+      <span class="note">listas fragmentadas arregladas 2026-07-11, y su único split a mitad de lista ("hebras no" / "se separen, pero...") se unió al mismo tiempo</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-mordentado/mordientes" target="_blank" rel="noopener"><code>color-sobre-fibra/guia-de-mordentado/mordientes.jsx</code></a>
+      <span class="note">verificado contra PDF: split real ("...Úsalo solo con fibras de origen animal," / "porque puede dañar las vegetales...") unido 2026-07-11</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-tenido" target="_blank" rel="noopener"><code>color-sobre-fibra/guia-de-tenido.jsx</code></a>
+      <span class="note">listas fragmentadas arregladas 2026-07-11 (convertida a MaterialList); revisión de párrafo aparte confirmó 2 splits reales fuera de la lista ("...el color migra, se apaga" / "o vira en cuestión de días..." y "...van a estar en" / "contacto con la piel..."), ambos unidos 2026-07-11</span>
+    </div>
+  </li>
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-en-movimiento/recomendaciones-generales" target="_blank" rel="noopener"><code>color-en-movimiento/recomendaciones-generales.jsx</code></a>
+      <span class="note">listas fragmentadas arregladas 2026-07-11, y su único split a mitad de lista ("estas" / "preparaciones son puntos de partida...") se unió al mismo tiempo</span>
+    </div>
+  </li>
+</ul>
+
+<div class="footnote">
+  Los 7 splits reales de párrafo (6 archivos abiertos + 1 extra hallado al
+  re-revisar <code>guia-de-tenido.jsx</code>) quedaron unidos el 2026-07-11,
+  cada uno verificado línea por línea contra <code>pdftotext -layout</code>
+  del PDF fuente antes de unir. <code>bin/vite build</code> sale con exit 0
+  (solo ruido pre-existente de deprecación de Sass de Bootstrap, no
+  relacionado). De paso se encontraron 2 bugs de OCR corrupto en pasos de
+  receta (no splits de párrafo, fuera de alcance de este finding, quedan sin
+  corregir): <code>color-cotidiano/tinta-botanica.jsx</code> paso 1 y
+  <code>color-en-movimiento/pintura-textil.jsx</code> paso 1 — ver notas
+  arriba.
+</div>
+
+<h3>No son bugs realmente (verificado contra el PDF, dejar como está)</h3>
+<ul class="items">
+  <li>
+    <span class="status low">Info</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/elegir-el-textil" target="_blank" rel="noopener"><code>color-sobre-fibra/elegir-el-textil.jsx</code></a> — el cuerpo del
+      <code>&lt;Callout&gt;</code> empieza en minúscula ("cada fibra
+      reacciona..."), coincide con el PDF textualmente. Los callouts
+      "Importante:" de este libro se escriben con continuación en minúscula
+      después de la etiqueta en negrita — mismo patrón que
+      <code>pigmentos-de-laca.jsx</code>. No es una oración partida.
+    </div>
+  </li>
+  <li>
+    <span class="status low">Info</span>
+    <div><a class="file-link" href="http://localhost:3000/manual-del-color-vivo/pigmento-y-polvo/pigmentos-de-laca" target="_blank" rel="noopener"><code>pigmento-y-polvo/pigmentos-de-laca.jsx</code></a> — misma razón ("usa cubrebocas...").</div>
+  </li>
+  <li>
+    <span class="status low">Info</span>
+    <div><a class="file-link" href="http://localhost:3000/manual-del-color-vivo/glosario" target="_blank" rel="noopener"><code>glosario.jsx</code></a> — el único hit de <code>&lt;p&gt;</code> en minúscula es el término de glosario <code>pH:</code> mismo, no una continuación.</div>
+  </li>
+</ul>
+
+<h2>3. Pulido de estilo (baja prioridad)</h2>
+<ul class="items">
+  <li class="done">
+    <span class="status done">Fixed</span>
+    <div>
+      <a class="file-link" href="http://localhost:3000/manual-del-color-vivo/glosario" target="_blank" rel="noopener"><code>glosario.jsx</code></a> — los 38 términos convertidos a
+      <code>&lt;p&gt;&lt;strong&gt;Término&lt;/strong&gt; — definición&lt;/p&gt;</code>,
+      igualando la convención de <code>Material</code>. Conversión hecha con
+      script (split en el primer <code>": "</code> tras <code>&lt;p&gt;</code>),
+      verificado que no tocó los dos-puntos internos de definiciones (p. ej.
+      "pH:" dentro del cuerpo de Antocianinas quedó intacto). Los 38 revisados
+      a mano tras la conversión, ninguno mal cortado. <code>bin/vite build</code>
+      exit 0.
+    </div>
+  </li>
+</ul>
+
+<h2>Checklist de verificación por lote</h2>
+<ol class="verify">
+  <li><code>grep -rc '&lt;ul' app/frontend/pages/manual-del-color-vivo | grep -v ':0'</code> luego comparar conteos <code>ul</code> vs <code>li</code> por archivo para confirmar que no quedan listas de un solo ítem</li>
+  <li><code>grep -rEn '&lt;p&gt;[a-záéíóúñ]' app/frontend/pages/manual-del-color-vivo</code> re-correr y revisar cada hit manualmente contra la salida de <code>pdftotext -layout</code> antes de decidir que es un split real</li>
+  <li><code>bundle exec rspec spec/manual_content_spec.rb</code></li>
+  <li><code>bin/vite build</code> (exit 0, sin errores — ignorar el ruido pre-existente de deprecación de Sass de Bootstrap desde <code>rails_admin</code>, no relacionado)</li>
+  <li>Revisar 2–3 páginas arregladas en el navegador contra el PDF para fidelidad</li>
+</ol>
+
+</body>
+</html>

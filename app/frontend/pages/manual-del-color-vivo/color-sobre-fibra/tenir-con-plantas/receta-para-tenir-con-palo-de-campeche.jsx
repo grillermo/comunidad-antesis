@@ -1,4 +1,5 @@
 import ManualLayout from '@/components/ManualLayout'
+import { MaterialList, Material } from '@/components/manual/MaterialList'
 import Recipe from '@/components/manual/Recipe'
 import Steps from '@/components/manual/Steps'
 import SideNote from '@/components/manual/SideNote'
@@ -13,19 +14,18 @@ export default function Page({ title }) {
       <p>El palo de Campeche, además, produce azules, lavandas, morados, grises y un tinte negro muy duradero y resistente a la luz. Tiñe intensamente los núcleos de las células, por lo que se utiliza en histología hasta el día de hoy.</p>
       <p>La explotación intensiva de este árbol dejó cicatrices en los bosques de la península, así que para trabajar con él debes obtenerlo de proveedores que tengan certificación de manejo sustentable.</p>
       <p>Para esta receta puedes jugar con la intensidad del tinte diluyéndolo en más agua o con modificadores de color.</p>
-      <pre className="overflow-x-auto whitespace-pre font-body text-sm leading-6">Materiales
-         •   Madeja 100% lana (pesa           •   1 gramo de sulfato ferroso
-             aproximadamente 100
-             gramos)                          •   100 gramos de palo de
-                                                  Campeche
-         •   Jabón
-                                              •   Olla
-         •   10 gramos de alumbre
-             potásico                         •   Agua
-             o sulfato de aluminio
-                                              •   Fuente de calor
-         •   1 gramo de cremor tártaro</pre>
-      <Recipe rendimiento={""} tiempo={"16 horas aproximadamente, 2 horas de trabajo activo."}>
+      <MaterialList>
+        <Material term="Madeja 100% lana (pesa aproximadamente 100 gramos)" />
+        <Material term="Jabón" />
+        <Material term="10 gramos de alumbre potásico o sulfato de aluminio" />
+        <Material term="1 gramo de cremor tártaro" />
+        <Material term="1 gramo de sulfato ferroso" />
+        <Material term="100 gramos de palo de Campeche" />
+        <Material term="Olla" />
+        <Material term="Agua" />
+        <Material term="Fuente de calor" />
+      </MaterialList>
+      <Recipe tiempo="16 horas aproximadamente, 2 horas de trabajo activo.">
         <Steps>
           <li>Remoja el palo de Campeche en suficiente agua durante al menos 12 horas.</li>
           <li>Lava la madeja con agua tibia y jabón.</li>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manual del Color Vivo — listas fragmentadas corregidas</title>
+<style>
+  :root {
+    --cream: #F5EFDA;
+    --blue: #33538C;
+    --blue-ink: #2A3F6B;
+    --orange: #EF6C15;
+    --orange-ink: #E5620C;
+  }
+  body {
+    font-family: -apple-system, "Nunito Sans", ui-sans-serif, sans-serif;
+    background: var(--cream);
+    color: var(--blue-ink);
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+    line-height: 1.55;
+  }
+  h1 { font-size: 1.5rem; color: var(--blue); margin-bottom: 0.25rem; }
+  .subtitle { opacity: 0.75; margin-bottom: 1.5rem; font-size: 0.92rem; }
+  .meta {
+    background: white;
+    border-left: 4px solid var(--orange);
+    padding: 0.85rem 1.1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    font-size: 0.88rem;
+  }
+  ol { padding-left: 1.3rem; }
+  li { margin-bottom: 0.6rem; }
+  .card {
+    background: white;
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .card a.page-link {
+    color: var(--orange-ink);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .card a.page-link:hover { text-decoration: underline; }
+  .card .path {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    color: var(--blue-ink);
+    opacity: 0.6;
+    margin-top: 0.15rem;
+  }
+  .card .note {
+    font-size: 0.78rem;
+    color: var(--blue-ink);
+    opacity: 0.8;
+    margin-top: 0.2rem;
+  }
+  .card .badge {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: #2E7D32;
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .card .badge.special {
+    background: var(--blue);
+  }
+  .baseurl {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    background: #f0ead6;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Manual del Color Vivo — listas fragmentadas corregidas</h1>
+<div class="subtitle">8 páginas donde cada &lt;li&gt; vivía en su propio &lt;ul&gt; ahora agrupadas en una sola lista por sección (finding 5 del review)</div>
+
+<div class="meta">
+  Servidor local: <span class="baseurl">http://localhost:3000</span> (ajusta si usas otro puerto). Rutas requieren sesión autenticada — inicia sesión primero o los links redirigirán a login. Verifica que cada página muestre viñetas seguidas en un solo bloque, sin espaciado extra entre ítems.
+</div>
+
+<ol>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/retenido" target="_blank" rel="noopener">Reteñido</a>
+      <div class="path">color-sobre-fibra/retenido</div>
+      <div class="note">2 listas separadas: 3 consejos + 8 combinaciones de color</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/consejos-para-tenir-ropa" target="_blank" rel="noopener">Consejos para teñir ropa</a>
+      <div class="path">color-sobre-fibra/consejos-para-tenir-ropa</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-lavado" target="_blank" rel="noopener">Guía de lavado</a>
+      <div class="path">color-sobre-fibra/guia-de-lavado</div>
+      <div class="note">también unía una oración partida a mitad del primer ítem (madeja)</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-tenido" target="_blank" rel="noopener">Guía de teñido</a>
+      <div class="path">color-sobre-fibra/guia-de-tenido</div>
+      <div class="note">convertida a MaterialList/Material (término en negrita — definición)</div>
+    </div>
+    <span class="badge special">Fixed · MaterialList</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-indigo/resolucion-de-problemas-al-tenir-con-indigo" target="_blank" rel="noopener">Resolución de problemas al teñir con índigo</a>
+      <div class="path">color-sobre-fibra/tenir-con-indigo/resolucion-de-problemas-al-tenir-con-indigo</div>
+      <div class="note">primer ítem era intro, se movió a &lt;p&gt; suelto antes de la lista; también unió una oración partida (baño reducido)</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/guia-de-cuidados" target="_blank" rel="noopener">Guía de cuidados</a>
+      <div class="path">color-sobre-fibra/guia-de-cuidados</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-en-movimiento/recomendaciones-generales" target="_blank" rel="noopener">Recomendaciones generales</a>
+      <div class="path">color-en-movimiento/recomendaciones-generales</div>
+      <div class="note">unió una oración partida a mitad del tercer ítem (aglutinantes comerciales)</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+  <li class="card">
+    <div>
+      <a class="page-link" href="http://localhost:3000/manual-del-color-vivo/color-sobre-fibra/tenir-con-plantas/recomendaciones-antes-de-tenir" target="_blank" rel="noopener">Recomendaciones antes de teñir</a>
+      <div class="path">color-sobre-fibra/tenir-con-plantas/recomendaciones-antes-de-tenir</div>
+    </div>
+    <span class="badge">Fixed</span>
+  </li>
+</ol>
+
+</body>
+</html>

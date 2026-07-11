@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Review: Manual Content Authoring Pass (2026-07-10 spec)</title>
+<style>
+  :root {
+    --cream: #F5EFDA;
+    --blue: #33538C;
+    --blue-ink: #2A3F6B;
+    --orange: #EF6C15;
+    --orange-ink: #E5620C;
+    --critical: #C0392B;
+    --high: #E5620C;
+    --medium: #B8860B;
+    --low: #5A7A5A;
+    --ok: #2E7D32;
+  }
+  body {
+    font-family: -apple-system, "Nunito Sans", ui-sans-serif, sans-serif;
+    background: var(--cream);
+    color: var(--blue-ink);
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+    line-height: 1.55;
+  }
+  h1 {
+    font-size: 1.7rem;
+    color: var(--blue);
+    margin-bottom: 0.25rem;
+  }
+  .subtitle {
+    color: var(--blue-ink);
+    opacity: 0.75;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+  .meta {
+    background: white;
+    border-left: 4px solid var(--orange);
+    padding: 1rem 1.25rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    font-size: 0.92rem;
+  }
+  .meta div { margin: 0.15rem 0; }
+  .meta b { color: var(--blue); }
+  h2 {
+    color: var(--blue);
+    border-bottom: 2px solid var(--blue);
+    padding-bottom: 0.3rem;
+    margin-top: 2.5rem;
+  }
+  h3 {
+    margin-top: 0;
+    font-size: 1.05rem;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.75rem;
+    margin: 1.25rem 0 2rem;
+  }
+  .stat {
+    background: white;
+    border-radius: 6px;
+    padding: 0.9rem 1rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .stat .n { font-size: 1.5rem; font-weight: 700; color: var(--blue); }
+  .stat .l { font-size: 0.8rem; opacity: 0.75; }
+  .finding {
+    background: white;
+    border-radius: 6px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 1.1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-left: 5px solid var(--medium);
+  }
+  .finding.critical { border-left-color: var(--critical); }
+  .finding.high { border-left-color: var(--high); }
+  .finding.medium { border-left-color: var(--medium); }
+  .finding.low { border-left-color: var(--low); }
+  .finding.ok { border-left-color: var(--ok); }
+  .badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    color: white;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .badge.critical { background: var(--critical); }
+  .badge.high { background: var(--high); }
+  .badge.medium { background: var(--medium); }
+  .badge.low { background: var(--low); }
+  .badge.ok { background: var(--ok); }
+  code, .files {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+  }
+  .files {
+    background: #f0ead6;
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+    margin: 0.6rem 0;
+    word-break: break-all;
+    color: var(--blue-ink);
+  }
+  .files li { margin-bottom: 0.15rem; }
+  pre.code-sample {
+    background: #1e2530;
+    color: #d8e0ef;
+    padding: 0.9rem 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin: 0.7rem 0;
+  }
+  pre.code-sample .cmt { color: #8fa1c7; }
+  table.diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.7rem 0;
+    font-size: 0.85rem;
+  }
+  table.diff-table th, table.diff-table td {
+    border: 1px solid #ddd4b8;
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.diff-table th { background: #f0ead6; }
+  .toc {
+    background: white;
+    border-radius: 6px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .toc a { color: var(--orange-ink); text-decoration: none; font-weight: 600; }
+  .toc a:hover { text-decoration: underline; }
+  .toc li { margin: 0.25rem 0; }
+  .footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd4b8;
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+
+<h1>Manual Content Authoring — Execution Review</h1>
+<div class="subtitle">Against spec: <code>docs/superpowers/specs/2026-07-10-manual-content-authoring-design.md</code></div>
+
+<div class="meta">
+  <div><b>Reviewed:</b> 2026-07-11</div>
+  <div><b>Scope:</b> 88 page files under <code>app/frontend/pages/manual-del-color-vivo/</code>, 7 components under <code>app/frontend/components/manual/</code>, prose fidelity vs. source PDF</div>
+  <div><b>Method:</b> full read of spec + all 7 components + ManualLayout + theme tokens; <code>pdftotext -layout</code> extraction of source PDF for line-by-line diff; grep-based sweep of all 88 pages for raw markup, hardcoded recipe fields, and split-paragraph artifacts; sampled verbatim diff on ~10 pages across all 5 parts.</div>
+  <div><b>Verified:</b> <code>bundle exec rspec spec/manual_content_spec.rb</code> passes (0 pages contain placeholder text). Vite/SSR build not run.</div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="n">88</div><div class="l">total page files</div></div>
+  <div class="stat"><div class="n">39</div><div class="l">pages using Recipe/Steps/SideNote correctly</div></div>
+  <div class="stat"><div class="n">13</div><div class="l">pages dumping raw <code>&lt;pre&gt;</code> ASCII blocks</div></div>
+  <div class="stat"><div class="n">10</div><div class="l">pages with one-<code>&lt;li&gt;</code>-per-<code>&lt;ul&gt;</code> fragmentation</div></div>
+  <div class="stat"><div class="n">22</div><div class="l">paragraphs split mid-sentence at PDF line breaks</div></div>
+  <div class="stat"><div class="n">5 / ~40</div><div class="l">recipe pages actually using &lt;MaterialList&gt;</div></div>
+  <div class="stat"><div class="n">1</div><div class="l">page using &lt;Subheading&gt; (of many that should)</div></div>
+</div>
+
+<div class="toc">
+  <b>Findings</b>
+  <ol>
+    <li><a href="#f1">CRITICAL — 13 pages bypass the component kit, dump raw PDF layout into &lt;pre&gt;</a></li>
+    <li><a href="#f2">HIGH — real data tables flattened into garbled &lt;pre&gt; blocks</a></li>
+    <li><a href="#f3">HIGH — sentences split across &lt;p&gt; tags at PDF line-wrap points</a></li>
+    <li><a href="#f4">MEDIUM — lists fragmented into one &lt;ul&gt; per item</a></li>
+    <li><a href="#f5">MEDIUM — component kit inconsistently adopted (MaterialList, Subheading)</a></li>
+    <li><a href="#f6">LOW — styling drift between hand-rolled and componentized lists</a></li>
+    <li><a href="#ok">What's correct — no action needed</a></li>
+  </ol>
+</div>
+
+<h2 id="f1"><span class="badge critical">Critical</span>13 pages bypass the component kit</h2>
+<div class="finding critical">
+  <p>Spec §"Semantic Component Kit" designed <code>&lt;Recipe&gt;</code>, <code>&lt;Steps&gt;</code>, <code>&lt;MaterialList&gt;</code> specifically so recipe pages render as styled, semantic markup. These 13 pages instead paste the PDF's multi-column layout verbatim into <code>&lt;pre className="overflow-x-auto whitespace-pre"&gt;</code> blocks — words split across columns, empty bullets, "Procedimiento"/"Rendimiento"/"Tiempo" hardcoded as plain text instead of composed via <code>&lt;Recipe&gt;</code>/<code>&lt;Steps&gt;</code>.</p>
+  <ul class="files">
+    <li>color-sobre-fibra/tinta-textil.jsx</li>
+    <li>color-sobre-fibra/impresion-botanica.jsx</li>
+    <li>color-sobre-fibra/hapa-zome.jsx</li>
+    <li>color-sobre-fibra/modificadores-y-tratamientos-de-color.jsx</li>
+    <li>color-sobre-fibra/guia-de-mordentado/receta-para-mordentar.jsx</li>
+    <li>color-sobre-fibra/tenir-con-indigo/receta-de-tinte-de-indigo-con-fructosa.jsx</li>
+    <li>color-sobre-fibra/tenir-con-indigo/receta-de-tinte-de-indigo-con-sulfato-ferroso.jsx</li>
+    <li>color-sobre-fibra/tenir-con-plantas/receta-general-para-tenir-con-plantas.jsx</li>
+    <li>color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-palo-de-campeche.jsx</li>
+    <li>color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-rubia.jsx</li>
+    <li>color-sobre-fibra/tenir-con-plantas/receta-para-tenir-con-cascara-de-granada.jsx</li>
+    <li>pigmento-y-polvo/pigmentos-de-laca.jsx</li>
+    <li>color-cotidiano/envoltorios-de-cera-de-abeja.jsx</li>
+  </ul>
+  <p><b>Actual code</b> — <code>tinta-textil.jsx:9-31</code>:</p>
+  <pre class="code-sample">&lt;pre className="overflow-x-auto whitespace-pre font-body text-sm leading-6"&gt;Materiales
+   •   10 g de material vegetal con              •    2 recipientes para
+       propiedades tintóreas (palo                    dividir la tinta.
+       de Campeche, cáscara de
+       granada, rubia, cochinilla u              •    Olla pequeña o vaso de
+       otro).                                         precipitado para reducir.&lt;/pre&gt;
+...
+&lt;p&gt;Procedimiento&lt;/p&gt;
+&lt;pre ...&gt;Tiempo: 40 horas      1. Lava o descruda la tela que quieres estampar.
+  aproximadamente,         Si lo deseas, puedes hacer un baño de taninos&lt;/pre&gt;
+&lt;p&gt;2. Coloca 10 gramos de materia vegetal ...&lt;/p&gt;  <span class="cmt">// step 1 in &lt;pre&gt;, step 2+ in plain &lt;p&gt; — inconsistent within one page</span></pre>
+  <p><b>What it should look like</b> — same pattern already used correctly on 39 other pages (e.g. <code>receta-para-preparar-carbonato-de-sodio.jsx</code>):</p>
+  <pre class="code-sample">&lt;MaterialList&gt;
+  &lt;Material term="10 g de material vegetal con propiedades tintóreas"&gt;palo de Campeche, cáscara de granada, rubia, cochinilla u otro&lt;/Material&gt;
+  &lt;Material term="2 recipientes"&gt;para dividir la tinta&lt;/Material&gt;
+  ...
+&lt;/MaterialList&gt;
+&lt;Recipe tiempo="40 horas aproximadamente, 2 horas de trabajo activo."&gt;
+  &lt;Steps&gt;
+    &lt;li&gt;Lava o descruda la tela que quieres estampar. ...&lt;/li&gt;
+    &lt;li&gt;Coloca 10 gramos de materia vegetal ...&lt;/li&gt;
+  &lt;/Steps&gt;
+&lt;/Recipe&gt;</pre>
+  <p><b>Impact:</b> horizontal-scroll monospace block on every viewport, worse on mobile; JSX also collapses/reflows whitespace inside these blocks in ways that don't match the source columns, so alignment is doubly broken. Direct contradiction of the spec's stated purpose for the kit.</p>
+</div>
+
+<h2 id="f2"><span class="badge high">High</span>Data tables flattened into garbled &lt;pre&gt;</h2>
+<div class="finding high">
+  <p>The kit has no table primitive — not anticipated in the spec. <code>guia-de-mordentado/receta-para-mordentar.jsx:28-63</code> jams the mordant reference table (Textil / Material / Base / Mordiente / Cantidad, 5 rows) into a single <code>&lt;pre&gt;</code>; cells interleave out of row order and are effectively unreadable.</p>
+  <table class="diff-table">
+    <tr><th>PDF source (columns aligned)</th><th>Rendered &lt;pre&gt; (cells interleaved)</th></tr>
+    <tr>
+      <td>Camiseta / Algodón 100% / Vegetal / 200g / 10% Alumbre potásico o acetato de aluminio / 20g</td>
+      <td><code>Peso<br>Textil Material Base Mordiente Cantidad<br>total<br>10% Alumbre po-<br>Cami- Algodón<br>tásico o acetato de 20 g<br>...</code></td>
+    </tr>
+  </table>
+  <p><b>Fix:</b> add a <code>&lt;Table&gt;</code> component to <code>app/frontend/components/manual/</code>, styled once like the rest of the kit, and re-lay this and any other reference tables (check for more under <code>color-sobre-fibra/</code> guía pages before assuming this is the only one).</p>
+</div>
+
+<h2 id="f3"><span class="badge high">High</span>Sentences split across &lt;p&gt; at PDF line-wrap points</h2>
+<div class="finding high">
+  <p>22 paragraphs across the corpus start with a lowercase letter — a strong signal the transcription copied the PDF's hard line-wraps as paragraph breaks instead of rejoining prose. Spec requires verbatim <i>prose</i>, not verbatim <i>linewrap</i>.</p>
+  <table class="diff-table">
+    <tr><th>File</th><th>Fragment A</th><th>Fragment B (should be joined)</th></tr>
+    <tr><td>color-sobre-fibra/guia-de-tenido.jsx:18-19</td><td>"...el color migra, se apaga"</td><td>"o vira en cuestión de días. Yo considero..."</td></tr>
+    <tr><td>color-sobre-fibra/guia-de-tenido.jsx:24-25</td><td>"...no arriesgar en fibras que van a estar en"</td><td>"contacto con la piel. Las utilizo para pintar..."</td></tr>
+    <tr><td>color-sobre-fibra/guia-de-mordentado/receta-para-mordentar.jsx:66-67</td><td>"Deja enfriar, retira las fibras, elimina el"</td><td>"exceso de agua y continúa con el teñido."</td></tr>
+  </table>
+  <p>Run <code>grep -rEn '&lt;p&gt;[a-záéíóúñ]' app/frontend/pages/manual-del-color-vivo</code> to enumerate the full set of 22 and rejoin each pair into one <code>&lt;p&gt;</code>.</p>
+</div>
+
+<h2 id="f4"><span class="badge medium">Medium</span>Lists fragmented into one &lt;ul&gt; per item</h2>
+<div class="finding medium">
+  <p>10 files wrap every single list item in its own <code>&lt;ul&gt;</code> instead of one list with multiple <code>&lt;li&gt;</code>. Breaks list semantics (assistive tech announces each as a separate list) and produces inconsistent spacing vs. properly-grouped lists elsewhere.</p>
+  <ul class="files">
+    <li>color-sobre-fibra/retenido.jsx — 11 separate &lt;ul&gt;</li>
+    <li>color-sobre-fibra/guia-de-tenido.jsx — 8</li>
+    <li>color-sobre-fibra/tenir-con-indigo/resolucion-de-problemas-al-tenir-con-indigo.jsx — 7</li>
+    <li>color-sobre-fibra/consejos-para-tenir-ropa.jsx — 7</li>
+    <li>color-sobre-fibra/guia-de-lavado.jsx — 7</li>
+    <li>color-sobre-fibra/guia-de-cuidados.jsx — 6</li>
+    <li>color-en-movimiento/recomendaciones-generales.jsx — 4</li>
+    <li>el-origen-del-color/medidas-de-seguridad.jsx — 3</li>
+    <li>color-sobre-fibra/tenir-con-plantas/recomendaciones-antes-de-tenir.jsx — 3</li>
+    <li>color-sobre-fibra/tenir-con-plantas/receta-general-para-tenir-con-plantas.jsx — 2</li>
+  </ul>
+  <p><b>Bonus find:</b> <code>guia-de-tenido.jsx:10-17</code>'s 8 items are literally <code>"Quinonas — rojos, marrones..."</code> — bold-term + em-dash — the exact shape <code>&lt;MaterialList&gt;/&lt;Material&gt;</code> was built for (spec: "the bold-term + em-dash bulleted material lists"), but hand-rolled as plain <code>&lt;ul&gt;</code> instead.</p>
+</div>
+
+<h2 id="f5"><span class="badge medium">Medium</span>Component kit inconsistently adopted</h2>
+<div class="finding medium">
+  <table class="diff-table">
+    <tr><th>Component</th><th>Pages importing it</th><th>Expected roughly</th></tr>
+    <tr><td>Recipe / Steps / SideNote</td><td>39</td><td>~40 recipe pages — good</td></tr>
+    <tr><td>Callout</td><td>32</td><td>most recipe/safety pages — good</td></tr>
+    <tr><td>MaterialList</td><td>5</td><td>should match Recipe count (~39) since nearly every recipe has a materials list</td></tr>
+    <tr><td>Subheading</td><td>1</td><td>spec explicitly names it for "Herramientas básicas", "Antes de empezar", "Durante el trabajo" — those section headings exist on multiple pages but render as plain text or missing structure</td></tr>
+    <tr><td>PartDivider</td><td>5</td><td>5 — correct, matches the 5 top-level parts</td></tr>
+  </table>
+</div>
+
+<h2 id="f6"><span class="badge low">Low</span>Styling drift</h2>
+<div class="finding low">
+  <ul>
+    <li>Hand-rolled <code>&lt;ul className="list-disc space-y-3 pl-6 marker:text-orange"&gt;</code> (e.g. <code>medidas-de-seguridad.jsx</code>) uses <code>space-y-3</code>; the real <code>&lt;MaterialList&gt;</code> component uses <code>space-y-4</code> — inconsistent vertical rhythm between hand-copied and componentized lists.</li>
+    <li><code>glosario.jsx</code> — all 38 terms are plain <code>&lt;p&gt;Ácido: ...&lt;/p&gt;</code>, term not bolded. Every other bold-term convention in the kit (<code>&lt;Material term=&gt;</code>) bolds the term; glossary doesn't, so terms don't visually stand out. (Term <i>order</i> matches the PDF exactly — verified Quinonas/Reducción/Solidez sequence — not a fidelity bug, just missing emphasis.)</li>
+  </ul>
+</div>
+
+<h2 id="ok"><span class="badge ok">OK</span>What's correct — no action needed</h2>
+<div class="finding ok">
+  <ul>
+    <li>~39 recipe pages compose <code>Recipe</code>/<code>Steps</code>/<code>Callout</code>/<code>SideNote</code> correctly and are verbatim-accurate — spot-checked <code>receta-para-preparar-carbonato-de-sodio.jsx</code> and <code>...carbonato-de-calcio.jsx</code> line-by-line against PDF pp.20-21 with an exact match.</li>
+    <li>All 5 part-divider illustrations + 10 Atlas raster pages present, correctly imported via the <code>@/assets</code> Vite alias, matching the spec's image-extraction plan.</li>
+    <li><code>ManualLayout</code> untouched (non-goal respected); theme tokens (<code>--color-*</code>, <code>--font-*</code>) used consistently and match <code>application.css</code>.</li>
+    <li>Phase G completion gate (<code>spec/manual_content_spec.rb</code>) present and passing — zero pages still contain the placeholder string.</li>
+    <li>Slugs unchanged, matching <code>Manual::TABLE_OF_CONTENTS</code> contract.</li>
+  </ul>
+</div>
+
+<div class="footer">
+  Generated from a manual code review session. Vite production build / SSR build were <b>not</b> run as part of this review — recommend running both before considering this pass closed.
+</div>
+
+</body>
+</html>
