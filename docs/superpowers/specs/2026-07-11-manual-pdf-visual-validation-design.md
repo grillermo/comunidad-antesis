@@ -3,17 +3,16 @@
 ## Context
 
 Phase 2c (`docs/superpowers/specs/2026-07-10-phase2c-manual-ssr-webpage-design.md`)
-shipped 87 authenticated SSR pages for *Manual del Color Vivo*, currently
-placeholder-only ("Contenido próximamente"). A later content-authoring pass
-(tracked separately, see `docs/superpowers/specs/2026-07-10-manual-content-authoring-design.md`)
-will transcribe the book's prose into each page body.
+shipped 87 authenticated SSR pages for *Manual del Color Vivo*. A subsequent
+content-authoring pass (`docs/superpowers/specs/2026-07-10-manual-content-authoring-design.md`)
+has since transcribed the book's prose into most page bodies.
 
-This spec covers a small developer tool to make that transcription pass
-easier to verify: a **side-by-side comparison view, visible only in
-`Rails.env.development?`**, showing the source PDF pages for a section next
-to the section's current rendered content, so a developer can visually check
-transcribed prose against the original book layout without alt-tabbing to a
-PDF viewer.
+This spec covers a small developer tool to make that transcription easier to
+verify (already-transcribed pages, and any future edits/corrections): a
+**side-by-side comparison view, visible only in `Rails.env.development?`**,
+showing the source PDF pages for a section next to the section's current
+rendered content, so a developer can visually check transcribed prose against
+the original book layout without alt-tabbing to a PDF viewer.
 
 The source PDF lives at `project/*.pdf` (gitignored, 136 pages, local-only —
 already referenced this way in the Phase 2c spec).
@@ -98,8 +97,12 @@ end
   `1..136`.
 - Checks `tmp/manual_pdf_pages/<page>.png`; if missing, shells out to
   `pdftoppm` via `Open3.capture2` with an **argv array** (never string
-  interpolation into a shell) to rasterize just that page at 150 DPI into the
-  cache dir.
+  interpolation into a shell):
+  `["pdftoppm", "-png", "-singlefile", "-r", "150", "-f", page.to_s, "-l",
+  page.to_s, pdf_path.to_s, "tmp/manual_pdf_pages/#{page}"]`. The `-singlefile`
+  flag is required — without it `pdftoppm` appends its own page-number suffix
+  to the output filename, which would not match the `<page>.png` name the
+  controller expects to serve.
 - Sends the cached PNG with `send_file`.
 - Defense in depth: the controller itself also raises
   `ActionController::RoutingError` unless `Rails.env.development?`, so even
@@ -110,54 +113,65 @@ end
 `tmp/manual_pdf_pages/` is already covered by the repo's existing `tmp/`
 gitignore — no new ignore rule needed.
 
-### 3. `ManualController#show`
+### 3. `ManualController` — share `pdfPages`, don't prop-drill
 
-In development only, after resolving the node, look up
-`Manual.pdf_page_range(params[:component])` and include it as a `pdfPages`
-prop (e.g. `[5, 6]`) when present:
+The 87 generated page stubs (e.g. `app/frontend/pages/manual-del-color-vivo/glosario.jsx`)
+each destructure only `{ title }` and pass no other props through to
+`ManualLayout`. Threading a new `pdfPages` prop through `render inertia:
+..., props: {...}` would therefore require editing all 87 stub files to
+forward it — real scope creep for a small dev tool, and easy to miss on
+future-generated stubs.
+
+Instead, reuse the pattern `InertiaController` already establishes with
+`inertia_share user: -> { ... }` (`app/controllers/inertia_controller.rb:4`):
+a shared prop is visible to every component via Inertia's `usePage()`,
+independent of what the page component itself declares. Add a
+controller-level share in `ManualController`, evaluated per-request so it
+can depend on `params`:
 
 ```ruby
-def show
-  segments = params[:component].split("/")
-  node = Manual.find(segments)
-  raise ActiveRecord::RecordNotFound unless node
+class ManualController < InertiaController
+  before_action :authenticate_user!
 
-  props = { title: node[:title] }
-  if Rails.env.development?
+  inertia_share do
+    next unless Rails.env.development?
     range = Manual.pdf_page_range(params[:component])
-    props[:pdfPages] = (range.first..range.last).to_a if range
+    { pdfPages: range ? (range.first..range.last).to_a : nil }
   end
 
-  render inertia: "manual-del-color-vivo/#{params[:component]}", props: props
+  # ...
 end
 ```
 
-Production and test requests never populate `pdfPages` — the prop key is
-simply absent from the response.
+Production and test requests never evaluate this block's body meaningfully
+(`Rails.env.development?` is false), so `pdfPages` is never part of the
+Inertia payload outside development. On the `Index` action `params[:component]`
+is nil, `Manual.pdf_page_range(nil)` returns `nil`, so `pdfPages` is `nil`
+there too.
 
 ### 4. `ManualLayout.jsx`
 
-Extend the existing shared layout (`app/frontend/components/ManualLayout.jsx`)
-to accept an optional `pdfPages` prop (array of page numbers) alongside the
-existing `title`/`children`/`hideTitle`. Each of the 87 generated page stubs
-already renders `<ManualLayout title={title}>...</ManualLayout>` and forwards
-whatever props its `Page` component receives — so page stubs pass `pdfPages`
-through unchanged; no per-page edits needed.
+`ManualLayout` reads the shared prop itself via `usePage().props.pdfPages`
+(`import { usePage } from '@inertiajs/react'`) rather than accepting it as a
+component prop — this is what makes per-page edits unnecessary, per §3
+above.
 
 When `pdfPages` is present and non-empty:
 
-- Render a two-column CSS grid. Left column: a vertically stacked,
-  independently scrollable list of `<img src={\`/dev/manual_pdf_pages/${n}.png\`}>`
-  for each page number. Right column: the existing single-column content
-  (back-link, title, children) exactly as today.
+- Render a two-column CSS grid (`grid-cols-[1fr_1fr]` on a wide viewport,
+  each column independently scrollable via `overflow-y-auto` with its own
+  `max-h-screen`). Left column: a vertically stacked list of
+  `<img src={\`/dev/manual_pdf_pages/${n}.png\`}>` for each page number, full
+  column width, natural aspect ratio. Right column: the existing
+  single-column content (back-link, title, children) exactly as today.
 - A small toggle button (top of the left column) collapses it, expanding the
   right column to full width; state is local `useState`, defaults to
   expanded.
 
-When `pdfPages` is absent (always true in production/test, and true in
-development for the `Index` page and any unmapped path): render exactly the
-current single-column markup, unchanged. No visual or behavioral diff from
-today.
+When `pdfPages` is absent or `nil` (always true in production/test, and true
+in development for the `Index` page and any unmapped path): render exactly
+the current single-column markup, unchanged. No visual or behavioral diff
+from today.
 
 ## Error handling
 
