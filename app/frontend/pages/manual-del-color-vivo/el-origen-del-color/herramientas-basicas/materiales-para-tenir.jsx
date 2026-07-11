@@ -1,10 +1,19 @@
 import ManualLayout from '@/components/ManualLayout'
+import { MaterialList, Material } from '@/components/manual/MaterialList'
 
-// Placeholder page. Prose is transcribed in a later content pass.
 export default function Page({ title }) {
   return (
     <ManualLayout title={title}>
-      <p className="text-blue-ink/60">Contenido próximamente.</p>
+      <MaterialList>
+        <Material term="Jabón de ropa neutro">Cualquier jabón sin perfumes, suavizantes, enzimas ni blanqueadores. Funciona el jabón de coco puro, el jabón de Marsella, el jabón de Castilla, o detergentes específicos para lana. Evita los detergentes comerciales perfumados ya que interfieren con el tinte.</Material>
+        <Material term="Vinagre blanco" />
+        <Material term="Carbonato de sodio para lavar profundamente las fibras. Podrás encontrar una receta más adelante en esta sección." />
+        <Material term="Alumbre potásico para fijar el color">Ya sea en polvo o en piedra, lo puedes encontrar en farmacias, tiendas naturistas, herbolarias y mercados.</Material>
+        <Material term="Crémor tártaro">Se usa para mejorar el color en lana o seda y lo puedes encontrar en tiendas de repostería.</Material>
+        <Material term="Tela o hilo de origen natural como seda, lana, lino o algodón" />
+        <Material term="Colorantes naturales">Consulta el atlas del color al final del manual.</Material>
+        <Material term="Sulfato ferroso heptahidratado">Se usa para modificar el color. Lo puedes conseguir en tiendas de jardinería. (se vende como corrector de hierro para plantas)</Material>
+      </MaterialList>
     </ManualLayout>
   )
 }

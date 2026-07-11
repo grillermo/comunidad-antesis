@@ -29,8 +29,8 @@ tmux send-keys -t "$SESSION:main.2" "source .env 2>/dev/null; bin/vite dev" C-m
 # Pane 3: Solid Queue worker
 tmux send-keys -t "$SESSION:main.3" "source .env 2>/dev/null; RAILS_LOG_TO_STDOUT=1 bin/jobs" C-m
 
-# Pane 4: Inertia SSR server (build once, then serve on :13714)
-tmux send-keys -t "$SESSION:main.4" "source .env 2>/dev/null; bin/vite build --ssr && bin/vite ssr" C-m
+# Pane 4: Build client assets used by SSR, then serve SSR on :13714
+tmux send-keys -t "$SESSION:main.4" "source .env 2>/dev/null; bin/vite build && bin/vite build --ssr && bin/vite ssr" C-m
 
 tmux select-layout -t "$SESSION:main" tiled
 

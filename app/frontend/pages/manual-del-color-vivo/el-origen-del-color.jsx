@@ -1,10 +1,11 @@
 import ManualLayout from '@/components/ManualLayout'
+import PartDivider from '@/components/manual/PartDivider'
+import divider from '@/assets/manual/divider-el-origen-del-color.jpg'
 
-// Placeholder page. Prose is transcribed in a later content pass.
 export default function Page({ title }) {
   return (
-    <ManualLayout title={title}>
-      <p className="text-blue-ink/60">Contenido próximamente.</p>
+    <ManualLayout title={title} hideTitle>
+      <PartDivider image={divider} title={title} />
     </ManualLayout>
   )
 }
