@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_11_210412) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_11_210643) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -29,6 +29,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_11_210412) do
     t.index ["ancestry"], name: "index_comments_on_ancestry"
     t.index ["section_path", "ancestry"], name: "index_comments_on_section_path_and_ancestry"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "hearts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "comment_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["comment_id"], name: "index_hearts_on_comment_id"
+    t.index ["user_id", "comment_id"], name: "index_hearts_on_user_id_and_comment_id", unique: true
+    t.index ["user_id"], name: "index_hearts_on_user_id"
   end
 
   create_table "newsletter_emails", force: :cascade do |t|
@@ -188,6 +198,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_11_210412) do
   end
 
   add_foreign_key "comments", "users"
+  add_foreign_key "hearts", "comments"
+  add_foreign_key "hearts", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

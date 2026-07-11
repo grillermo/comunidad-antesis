@@ -544,7 +544,7 @@ git commit -m "Add soft-delete tombstone to Comment"
 - Modify: `app/models/comment.rb`
 - Test: `spec/models/heart_spec.rb`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `spec/models/heart_spec.rb`:
 
@@ -573,12 +573,12 @@ RSpec.describe Heart, type: :model do
 end
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `bundle exec rspec spec/models/heart_spec.rb`
 Expected: FAIL — uninitialized constant `Heart`.
 
-- [ ] **Step 3: Migration**
+- [x] **Step 3: Migration**
 
 ```ruby
 class CreateHearts < ActiveRecord::Migration[8.0]
@@ -595,7 +595,7 @@ end
 
 Run: `bin/rails db:migrate`
 
-- [ ] **Step 4: Models**
+- [x] **Step 4: Models**
 
 Create `app/models/heart.rb`:
 
@@ -614,7 +614,7 @@ Add to `app/models/comment.rb` (with associations):
   has_many :hearts, dependent: :destroy
 ```
 
-- [ ] **Step 4b: Heart factory**
+- [x] **Step 4b: Heart factory**
 
 Create `spec/factories/hearts.rb`:
 
@@ -627,12 +627,12 @@ FactoryBot.define do
 end
 ```
 
-- [ ] **Step 5: Run and confirm pass**
+- [x] **Step 5: Run and confirm pass**
 
 Run: `bundle exec rspec spec/models/heart_spec.rb`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add db/migrate db/schema.rb app/models/heart.rb app/models/comment.rb spec/models/heart_spec.rb spec/factories/hearts.rb

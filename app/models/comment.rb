@@ -4,6 +4,7 @@ class Comment < ApplicationRecord
   has_ancestry
 
   belongs_to :user
+  has_many :hearts, dependent: :destroy
 
   validates :body, presence: true
   validate :section_path_must_exist
