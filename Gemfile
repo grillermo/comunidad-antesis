@@ -39,6 +39,8 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "factory_bot_rails", "~> 6.4"
 end
 
 group :development do
@@ -57,5 +59,8 @@ gem "vite_rails", "~> 3.11"
 gem "http", "~> 6.0"
 
 gem "devise", "~> 5.0"
+
+gem "ancestry", "~> 4.3"
+gem "commonmarker", "~> 1.1"
 
 gem "rails_admin", "~> 3.3"
