@@ -10,6 +10,17 @@
 
 **Spec:** `docs/superpowers/specs/2026-07-11-phase2d-comment-system-design.md`
 
+## Executor-approved reconciliations
+
+- RailsAdmin is the only moderation UI for sticky/approve controls; the
+  comment thread does not add a custom Inertia moderation UI.
+- `section` remains a top-level Inertia prop rather than being duplicated in
+  every serialized comment node.
+- Sticky comments are restricted to roots, replies cannot target deleted or
+  cross-section parents, and invalid/expired approval tokens render a friendly
+  error page.
+- Signed approval tokens consistently use purpose `:approve`.
+
 ---
 
 ## Naming reconciliation
@@ -444,6 +455,20 @@ Append to `spec/models/comment_spec.rb`:
       expect(c.display_body_html).to eq(c.body_html)
     end
   end
+
+  it "only allows sticky on root comments" do
+    parent = create(:comment)
+    expect(build(:comment, parent: parent, sticky: true)).not_to be_valid
+  end
+
+  it "rejects deleted and cross-section parents" do
+    deleted_parent = create(:comment)
+    deleted_parent.soft_delete!
+    expect(build(:comment, parent: deleted_parent)).not_to be_valid
+
+    other_parent = create(:comment, section_path: "color-sobre-fibra/introduccion")
+    expect(build(:comment, parent: other_parent)).not_to be_valid
+  end
 ```
 
 - [ ] **Step 2: Run and confirm failure**
@@ -468,6 +493,22 @@ Add to `app/models/comment.rb`:
 
   def display_body_html
     deleted? ? TOMBSTONE_HTML : body_html
+  end
+
+  validate :sticky_only_on_root
+  validate :parent_must_be_active_and_in_same_section
+
+  private
+
+  def sticky_only_on_root
+    errors.add(:sticky, "is only allowed on root comments") if sticky? && parent.present?
+  end
+
+  def parent_must_be_active_and_in_same_section
+    return unless parent
+
+    errors.add(:parent, "is deleted") if parent.deleted?
+    errors.add(:parent, "belongs to another section") if parent.section_path != section_path
   end
 ```
 
@@ -908,8 +949,9 @@ RSpec.describe "Manual section comments prop", type: :request do
     get "/manual-del-color-vivo/el-origen-del-color/introduccion"
 
     expect(response).to have_http_status(:ok)
-    comments = page_props(response).fetch("comments")
-    expect(comments.first).to include("body_html" => "<p>hola</p>", "section" => "el-origen-del-color/introduccion")
+    props = page_props(response)
+    expect(props.fetch("section")).to eq("el-origen-del-color/introduccion")
+    expect(props.fetch("comments").first.fetch("body_html")).to include("hola")
   end
 end
 ```
@@ -1047,6 +1089,18 @@ RSpec.describe "Comments", type: :request do
     it "rejects an unknown section" do
       sign_in user
       post "/comments", params: { comment: { section_path: "no/existe", body: "hi" } }
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it "rejects replies to deleted or cross-section parents" do
+      sign_in user
+      deleted_parent = create(:comment, section_path: section)
+      deleted_parent.soft_delete!
+      post "/comments", params: { comment: { section_path: section, body: "hi", parent_id: deleted_parent.id } }
+      expect(response).to have_http_status(:unprocessable_content)
+
+      other_parent = create(:comment, section_path: "color-sobre-fibra/introduccion")
+      post "/comments", params: { comment: { section_path: section, body: "hi", parent_id: other_parent.id } }
       expect(response).to have_http_status(:unprocessable_content)
     end
 
@@ -1398,7 +1452,7 @@ RSpec.describe CommentMailer, type: :mailer do
     # signed_id embeds a timestamp, so assert the link resolves rather than
     # comparing against a freshly minted (different) token string.
     token = mail.body.encoded[%r{/moderation/comments/approve/([^"'\s]+)}, 1]
-    expect(Comment.find_signed(token, purpose: :approve_comment)).to eq(comment)
+    expect(Comment.find_signed(token, purpose: :approve)).to eq(comment)
   end
 
   it "reply_notification targets the subscriber" do
@@ -1425,7 +1479,7 @@ class CommentMailer < ApplicationMailer
   def admin_notification(comment)
     @comment = comment
     @approve_url = moderation_comment_approval_url(
-      token: comment.signed_id(purpose: :approve_comment, expires_in: 7.days)
+      token: comment.signed_id(purpose: :approve, expires_in: 7.days)
     )
     admins = User.where(role: :admin).pluck(:email)
     mail(to: admins, subject: "Nuevo comentario en el manual")
@@ -1504,7 +1558,7 @@ require "rails_helper"
 RSpec.describe "Moderation approvals", type: :request do
   let(:comment) { create(:comment) }
 
-  def token(c, expires_in: 7.days) = c.signed_id(purpose: :approve_comment, expires_in: expires_in)
+  def token(c, expires_in: 7.days) = c.signed_id(purpose: :approve, expires_in: expires_in)
 
   it "approves via a valid signed token without login" do
     get "/moderation/comments/approve/#{token(comment)}"
@@ -1515,6 +1569,7 @@ RSpec.describe "Moderation approvals", type: :request do
   it "rejects a tampered token" do
     get "/moderation/comments/approve/not-a-real-token"
     expect(response).to have_http_status(:not_found)
+    expect(response.body).to include("Enlace de aprobación inválido")
   end
 
   it "rejects an expired token" do
@@ -1541,8 +1596,8 @@ module Moderation
     # Signed-token approval: intentionally no authentication. The token is a
     # scoped, expiring bearer credential minted only for admin emails.
     def show
-      comment = Comment.find_signed(params[:token], purpose: :approve_comment)
-      return head :not_found unless comment
+      comment = Comment.find_signed(params[:token], purpose: :approve)
+      return render inertia: "moderation/ApprovalError", status: :not_found unless comment
 
       comment.update!(approved: true)
       render inertia: "moderation/ApprovalConfirmation", props: { section: comment.section_path }
@@ -1561,6 +1616,19 @@ export default function ApprovalConfirmation({ section }) {
       <p className="mt-4">
         El comentario en <code>{section}</code> quedó aprobado.
       </p>
+    </main>
+  );
+}
+```
+
+Create `app/frontend/pages/moderation/ApprovalError.jsx`:
+
+```jsx
+export default function ApprovalError() {
+  return (
+    <main className="mx-auto max-w-lg p-8 text-center">
+      <h1 className="text-2xl font-bold">Enlace de aprobación inválido</h1>
+      <p className="mt-4">El enlace expiró o no es válido.</p>
     </main>
   );
 }
@@ -1712,9 +1780,9 @@ Create `app/frontend/components/comments/CommentNode.jsx` — renders one commen
 and its replies recursively: author, relative time, `dangerouslySetInnerHTML`
 from `body_html` (already sanitized server-side), a 💙 button posting to
 `/comments/:id/heart` with `hearts_count`, and reply/edit/delete controls gated
-by `can_edit`/`can_delete`. Admins see sticky + approve controls. Deleted nodes
-render the tombstone body and hide actions. Recurse over `replies` with visual
-indentation.
+by `can_edit`/`can_delete`. Sticky and approve controls remain in RailsAdmin;
+do not add a custom Inertia moderation UI. Deleted nodes render the tombstone
+body and hide actions. Recurse over `replies` with visual indentation.
 
 - [ ] **Step 3: CommentThread**
 
