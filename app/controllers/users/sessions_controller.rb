@@ -19,6 +19,14 @@ class Users::SessionsController < Devise::SessionsController
 
   protected
 
+  # Send readers back where they left off: an explicitly requested page (Devise
+  # stored location), else the last manual section they viewed, else the manual root.
+  def after_sign_in_path_for(resource)
+    stored_location_for(resource) ||
+      Manual.url_for(resource.last_manual_path) ||
+      "/manual-del-color-vivo"
+  end
+
   # Let Warden redirect failed sign-ins so the Inertia page receives the alert.
   def auth_options
     super.except(:recall)

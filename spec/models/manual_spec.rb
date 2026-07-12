@@ -38,4 +38,27 @@ RSpec.describe Manual do
       expect(Manual.path?(%w[does-not-exist])).to be(false)
     end
   end
+
+  describe ".url_for" do
+    it "builds the URL for a valid slash-joined path string" do
+      expect(Manual.url_for("el-origen-del-color/introduccion"))
+        .to eq("/manual-del-color-vivo/el-origen-del-color/introduccion")
+    end
+
+    it "builds the URL for a valid segment array" do
+      expect(Manual.url_for(%w[glosario])).to eq("/manual-del-color-vivo/glosario")
+    end
+
+    it "returns nil for an unknown, blank, or nil path" do
+      expect(Manual.url_for("does-not-exist")).to be_nil
+      expect(Manual.url_for("")).to be_nil
+      expect(Manual.url_for(nil)).to be_nil
+    end
+  end
+
+  describe "GLOSSARY_PATH" do
+    it "points at the glossary route" do
+      expect(Manual::GLOSSARY_PATH).to eq(Manual.url_for(%w[glosario]))
+    end
+  end
 end

@@ -117,6 +117,18 @@ module Manual
 
   module_function
 
+  # Where a signed-in reader lands when we have no last-viewed page for them.
+  GLOSSARY_PATH = "/manual-del-color-vivo/glosario"
+
+  # The manual URL for a slash-joined path string or an array of slugs, or nil
+  # when the path is not a real node (blank, unknown, or a since-removed slug).
+  def url_for(path)
+    segments = path.is_a?(String) ? path.split("/") : Array(path)
+    return nil unless path?(segments)
+
+    "/manual-del-color-vivo/#{segments.join('/')}"
+  end
+
   # Yields |node, path| for every node depth-first, where path is the array of
   # ancestor slugs including the node's own (e.g. %w[part section subsection]).
   def walk(nodes = TABLE_OF_CONTENTS, prefix = [], &block)

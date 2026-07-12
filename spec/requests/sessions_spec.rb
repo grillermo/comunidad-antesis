@@ -26,15 +26,55 @@ RSpec.describe "Sessions", type: :request do
     expect(inertia_page.fetch("component")).to eq("Login")
   end
 
-  it "signs in with valid credentials and redirects to root" do
+  it "signs in with valid credentials and redirects to the glossary when there is no manual history" do
     User.create!(email: "user@example.com", password: "password123")
 
     post "/users/sign_in", params: { user: { email: "user@example.com", password: "password123" } }
 
-    expect(response).to redirect_to(root_path)
+    expect(response).to redirect_to(Manual::GLOSSARY_PATH)
     expect(request.env.fetch("warden")).to be_authenticated(:user)
     follow_redirect!
     expect(response).to have_http_status(:ok)
+  end
+
+  it "signs in and redirects to the last manual page the user saw" do
+    user = User.create!(
+      email: "user@example.com",
+      password: "password123",
+      last_manual_path: "color-cotidiano/velas"
+    )
+
+    post "/users/sign_in", params: { user: { email: user.email, password: "password123" } }
+
+    expect(response).to redirect_to("/manual-del-color-vivo/color-cotidiano/velas")
+  end
+
+  it "falls back to the glossary when the stored manual path is no longer valid" do
+    user = User.create!(
+      email: "user@example.com",
+      password: "password123",
+      last_manual_path: "removed-in-a-later-edition"
+    )
+
+    post "/users/sign_in", params: { user: { email: user.email, password: "password123" } }
+
+    expect(response).to redirect_to(Manual::GLOSSARY_PATH)
+  end
+
+  it "prefers a Devise-stored location over the last manual page" do
+    user = User.create!(
+      email: "user@example.com",
+      password: "password123",
+      last_manual_path: "color-cotidiano/velas"
+    )
+
+    # Hitting a protected page unauthenticated makes Devise store the location.
+    get "/manual-del-color-vivo/glosario"
+    expect(response).to redirect_to("/users/sign_in")
+
+    post "/users/sign_in", params: { user: { email: user.email, password: "password123" } }
+
+    expect(response).to redirect_to("/manual-del-color-vivo/glosario")
   end
 
   it "rejects a known email with the wrong password using a generic alert" do

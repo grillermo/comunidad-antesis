@@ -36,6 +36,13 @@ RSpec.describe "Manual", type: :request do
     end
   end
 
+  it "records the last section a signed-in user views" do
+    sign_in user
+    get "/manual-del-color-vivo/color-cotidiano/velas"
+
+    expect(user.reload.last_manual_path).to eq("color-cotidiano/velas")
+  end
+
   it "returns 404 for an unknown slug" do
     sign_in user
     # No route is drawn for unknown slugs; Rails' router raises
