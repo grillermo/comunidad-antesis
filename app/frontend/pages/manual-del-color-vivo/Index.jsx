@@ -29,7 +29,7 @@ export default function Index({ contents, user }) {
         <p className="font-display text-xs font-semibold uppercase tracking-[0.14em] text-orange-ink">
           Manual del Color Vivo
         </p>
-        <h1 className="mt-3 font-display text-4xl font-bold text-orange">Contenido</h1>
+        <h1 className="mt-3 font-display text-4xl font-bold text-orange">Índice</h1>
         <div className="mt-8">
           <NodeList nodes={contents} prefix="/manual-del-color-vivo" />
         </div>
