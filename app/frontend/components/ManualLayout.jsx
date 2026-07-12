@@ -1,8 +1,9 @@
-import { Link, usePage } from '@inertiajs/react'
+import { Link, usePage, Deferred } from '@inertiajs/react'
 import CommentThread from './comments/CommentThread'
+import CommentsFallback from './comments/CommentsFallback'
 
 export default function ManualLayout({ title, children, hideTitle = false }) {
-  const { comments, section, nextPage } = usePage().props
+  const { section, nextPage } = usePage().props
 
   return (
     <main className="min-h-screen bg-cream font-body text-blue-ink">
@@ -19,7 +20,11 @@ export default function ManualLayout({ title, children, hideTitle = false }) {
             </Link>
           </div>
         ) : null}
-        {comments && section ? <CommentThread comments={comments} section={section} /> : null}
+        {section ? (
+          <Deferred data="comments" fallback={<CommentsFallback />}>
+            <CommentThread section={section} />
+          </Deferred>
+        ) : null}
       </div>
     </main>
   )

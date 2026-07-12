@@ -28,10 +28,12 @@ class ManualController < InertiaController
         title: Manual.find(next_node_path)[:title],
         url: Manual.url_for(next_node_path)
       },
-      comments: CommentTree.new(
-        section_path: params[:component],
-        current_user: Current.user
-      ).as_json
+      comments: InertiaRails.defer {
+        CommentTree.new(
+          section_path: params[:component],
+          current_user: Current.user
+        ).as_json
+      }
     }
   end
 
