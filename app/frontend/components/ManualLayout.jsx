@@ -27,27 +27,33 @@ export default function ManualLayout({ title, children, hideTitle = false }) {
 
   return (
     <main className="min-h-screen bg-cream font-body text-blue-ink">
-      <div className="mx-auto max-w-3xl px-6 pb-12 pt-4">
-        <div className="grid grid-cols-3 items-center gap-4">
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="justify-self-start font-display text-sm font-semibold text-blue-ink"
-          >
-            ← Atrás
-          </button>
-          <Link
-            href="/manual-del-color-vivo"
-            className="justify-self-center font-display text-sm font-semibold text-blue-ink"
-          >
-            ↑ Contenido
-          </Link>
-          <div className="justify-self-end">
-            <TopMenu user={user} />
+      <header className="sticky top-0 z-20 border-b border-blue-ink/10 bg-cream/95 backdrop-blur">
+        <div className="mx-auto max-w-3xl px-6 pb-3 pt-4">
+          <div className="grid grid-cols-3 items-center gap-4">
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="justify-self-start font-display text-sm font-semibold text-blue-ink"
+            >
+              ← Atrás
+            </button>
+            <Link
+              href="/manual-del-color-vivo"
+              className="justify-self-center font-display text-sm font-semibold text-blue-ink"
+            >
+              ↑ Contenido
+            </Link>
+            <div className="justify-self-end">
+              <TopMenu user={user} />
+            </div>
           </div>
+          {hideTitle ? null : (
+            <h1 className="mt-3 truncate font-display text-2xl font-bold text-orange">{title}</h1>
+          )}
         </div>
-        {hideTitle ? null : <h1 className="mt-4 font-display text-3xl font-bold text-orange">{title}</h1>}
-        <div className="mt-6 space-y-5 text-[1.05rem] leading-8">{children}</div>
+      </header>
+      <div className="mx-auto max-w-3xl px-6 pb-12 pt-6">
+        <div className="space-y-5 text-[1.05rem] leading-8">{children}</div>
         {nextPage ? (
           <div className="mt-10 text-right">
             <Link href={nextPage.url} className="font-display text-sm font-semibold text-orange-ink">
