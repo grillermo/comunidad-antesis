@@ -19,9 +19,15 @@ class ManualController < InertiaController
 
     remember_last_manual_path
 
+    next_node_path = Manual.next_path(segments)
+
     render inertia: "manual-del-color-vivo/#{params[:component]}", props: {
       title: node[:title],
       section: params[:component],
+      nextPage: next_node_path && {
+        title: Manual.find(next_node_path)[:title],
+        url: Manual.url_for(next_node_path)
+      },
       comments: CommentTree.new(
         section_path: params[:component],
         current_user: Current.user

@@ -7,7 +7,7 @@ function NodeList({ nodes, prefix }) {
         const href = `${prefix}/${node.slug}`
         return (
           <li key={href}>
-            <Link href={href} className="text-blue hover:text-orange">
+            <Link href={href} className="text-blue visited:text-orange-ink hover:text-orange">
               {node.title}
             </Link>
             {node.children.length > 0 && <NodeList nodes={node.children} prefix={href} />}

@@ -161,4 +161,14 @@ module Manual
   def path?(segments)
     !find(segments).nil?
   end
+
+  # The path of the node that follows the given path in reading (depth-first)
+  # order, or nil when segments is the last node or not a real path.
+  def next_path(segments)
+    all = paths
+    idx = all.index(Array(segments).map(&:to_s))
+    return nil if idx.nil?
+
+    all[idx + 1]
+  end
 end
