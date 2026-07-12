@@ -1,9 +1,28 @@
-import { Link, usePage, Deferred } from '@inertiajs/react'
+import { useEffect } from 'react'
+import { Link, usePage, Deferred, router } from '@inertiajs/react'
 import CommentThread from './comments/CommentThread'
 import CommentsFallback from './comments/CommentsFallback'
 
+// Same 88 page files Vite already chunks — reused here to warm the next
+// section's module. import.meta.glob dedupes to the existing chunks.
+const pageModules = import.meta.glob('../pages/manual-del-color-vivo/**/*.jsx')
+
 export default function ManualLayout({ title, children, hideTitle = false }) {
   const { section, nextPage } = usePage().props
+
+  useEffect(() => {
+    if (!nextPage) return
+
+    const timer = setTimeout(() => {
+      router.prefetch(nextPage.url, { method: 'get' }, { cacheFor: '30m' })
+
+      const slugPath = nextPage.url.replace('/manual-del-color-vivo/', '')
+      const chunkKey = `../pages/manual-del-color-vivo/${slugPath}.jsx`
+      pageModules[chunkKey]?.()
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [nextPage?.url])
 
   return (
     <main className="min-h-screen bg-cream font-body text-blue-ink">
