@@ -37,8 +37,10 @@ project/
 
 /public/assets
 
-# Ignore master key for decrypting credentials and more.
+# Ignore all credential keys for decrypting credentials and more.
 /config/master.key
+/config/credentials/*.key
+config/**/*.key
 
 # Vite Ruby
 /public/vite*
