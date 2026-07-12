@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react'
 import ManualLayout from '@/components/ManualLayout'
 import Recipe from '@/components/manual/Recipe'
 import Steps from '@/components/manual/Steps'
@@ -14,7 +15,7 @@ export default function Page({ title }) {
           <li>Asegúrate de que la fibra esté completamente cubierta de agua y se mueva libremente.</li>
           <li>Ponla a calentar. Cuando rompa el hervor, baja la flama y mantén a fuego bajo durante una hora, moviendo ocasionalmente.</li>
           <li>Apaga y deja que se enfríe por completo antes de vaciar. El agua saldrá turbia y amarillenta: es normal, son las impurezas disolviéndose.</li>
-          <li>Una vez descrudado, termina con un Lavado simple (ver receta anterior) antes de mordentar o teñir.</li>
+          <li>Una vez descrudado, termina con un <Link href="/manual-del-color-vivo/color-sobre-fibra/guia-de-lavado/lavado-simple" className="underline text-orange-ink hover:text-orange">Lavado simple</Link> (ver receta anterior) antes de mordentar o teñir.</li>
           <li>Seca o procede directo al teñido.</li>
         </Steps>
         <SideNote>Si la tela es cruda, la primera vez que toque el agua va a encoger aproximadamente un 10% tanto en largo como en ancho. Esto solo ocurre una vez. Algunas mantas y lonetas vienen tan cargadas de apresto que una sola ronda de descrudado no basta. Si después del primer descrudado la tela sigue sintiéndose rígida o el agua del enjuague sale turbia, repite el proceso. El agua del descrudado se puede tirar por el drenaje sin problema. El agua del enjuague final puede ser usada para regar plantas que no sean particularmente sensibles al pH alcalino (evita azaleas, gardenias, hortensias).</SideNote>

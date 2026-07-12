@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react'
 import ManualLayout from '@/components/ManualLayout'
 import { MaterialList, Material } from '@/components/manual/MaterialList'
 import Recipe from '@/components/manual/Recipe'
@@ -25,7 +26,7 @@ export default function Page({ title }) {
           <li>Descubre la parte superior y retira las plantas con cuidado.</li>
         </Steps>
         <SideNote>Tradicionalmente, esta técnica se hacía sobre papel pretratado con leche de soya: se remojaba durante 10 minutos y se dejaba secar antes de imprimir. El pretratamiento ayuda a que los colores duren más, pero no es indispensable. Si quieres experimentar, hazlo y compara resultados.</SideNote>
-        <SideNote>Prefiere plantas con propiedades tintóreas (revisa la sección “Atlas del color”). Las flores muy pigmentadas y las hojas tiernas dan mejores resultados que las hojas duras o secas.</SideNote>
+        <SideNote>Prefiere plantas con propiedades tintóreas (revisa la sección “<Link href="/manual-del-color-vivo/atlas-del-color" className="underline text-orange-ink hover:text-orange">Atlas del color</Link>”). Las flores muy pigmentadas y las hojas tiernas dan mejores resultados que las hojas duras o secas.</SideNote>
         <SideNote>El diseño terminado se decolora con la luz solar directa. Guarda tus piezas lejos del sol o, si las vas a enmarcar, considera un vidrio con filtro UV.</SideNote>
       </Recipe>
     </ManualLayout>

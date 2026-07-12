@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react'
 import ManualLayout from '@/components/ManualLayout'
 import { MaterialList, Material } from '@/components/manual/MaterialList'
 import Recipe from '@/components/manual/Recipe'
@@ -11,7 +12,7 @@ export default function Page({ title }) {
       <p>La técnica de impresión botánica es muy libre e intuitiva. No hay una manera absoluta de hacerla y los resultados son siempre diferentes. Aunque se utilicen las mismas fórmulas, los colores pueden cambiar dependiendo del tipo de agua, las herramientas, los mordientes, la técnica, los soportes, del método de cocción y la temporada del año.</p>
       <MaterialList>
         <Material term="Tela 100% natural, previamente lavada o descrudada y mordentada con sales de aluminio." />
-        <Material term="Hojas, flores u otro material tintóreo (preferentemente de la sección “Atlas del color”)" />
+        <Material term={<>Hojas, flores u otro material tintóreo (preferentemente de la sección “<Link href="/manual-del-color-vivo/atlas-del-color" className="underline text-orange-ink hover:text-orange">Atlas del color</Link>”)</>} />
         <Material term="Un cilindro para enrollar: tubo metálico, lata de aluminio o palo de bambú." />
         <Material term="Hilo o hilaza resistente al calor." />
         <Material term="Bolsa de plástico o tela vieja como barrera (opcional, para resultados más definidos)." />
@@ -21,11 +22,11 @@ export default function Page({ title }) {
         <Steps>
           <li>Lavar o descrudar la tela, según sea el caso.</li>
           <li>Mordentar la tela con sales de aluminio.</li>
-          <li>Colocar hojas, flores o material tintóreo sobre la tela. Identifica muy bien lo que vas a usar y prefiere plantas de la sección “Atlas del color”.</li>
+          <li>Colocar hojas, flores o material tintóreo sobre la tela. Identifica muy bien lo que vas a usar y prefiere plantas de la sección “<Link href="/manual-del-color-vivo/atlas-del-color" className="underline text-orange-ink hover:text-orange">Atlas del color</Link>”.</li>
           <li>Enrolla la tela firmemente alrededor de un cilindro y sujeta con hilo o hilaza. Puedes usar un tubo metálico, una lata de aluminio o palos de bambú.</li>
           <li>Somete el rollo a vapor o hiérvelo durante al menos 30 minutos. Si usas hojas duras como las del eucalipto, extiende el tiempo hasta 90 minutos.</li>
           <li>Espera a que se enfríe y desenrolla; aparecerán siluetas y colores transferidos.</li>
-          <li>Opcionalmente, puedes introducir la tela en un baño de sulfato ferroso para oscurecer los taninos de amarillo claro al gris o al verde. Prepara una cubeta con suficiente agua tibia y disuelve sulfato ferroso al 1% del peso del textil. (Revisa la sección de Sulfato ferroso en Modificadores y tratamientos de color)</li>
+          <li>Opcionalmente, puedes introducir la tela en un baño de sulfato ferroso para oscurecer los taninos de amarillo claro al gris o al verde. Prepara una cubeta con suficiente agua tibia y disuelve sulfato ferroso al 1% del peso del textil. (Revisa la sección de <Link href="/manual-del-color-vivo/color-sobre-fibra/modificadores-y-tratamientos-de-color/sulfato-ferroso" className="underline text-orange-ink hover:text-orange">Sulfato ferroso</Link> en Modificadores y tratamientos de color)</li>
           <li>Introduce la fibra ya teñida durante un máximo de 10 minutos y muévela constantemente con una pala de madera hasta que te guste el color.</li>
           <li>Retira y enjuaga (asegúrate de usar guantes). Para este paso no uso la lavadora ya que puede afectar el metal de la máquina.</li>
           <li>Si decides hacer este baño, es necesario neutralizar la fibra colocándola en agua con una taza de vinagre blanco durante 20 minutos.</li>
