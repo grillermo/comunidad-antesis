@@ -3,6 +3,16 @@
 @plugin '@tailwindcss/typography';
 @plugin '@tailwindcss/forms';
 
+@font-face {
+  font-family: "Ramona";
+  src: url("../fonts/Ramona-Bold.woff2") format("woff2"),
+       url("../fonts/Ramona-Bold.woff") format("woff"),
+       url("../fonts/Ramona-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-cream: #F5EFDA;
   --color-blue: #33538C;
@@ -11,6 +21,6 @@
   --color-orange: #EF6C15;
   --color-orange-ink: #E5620C;
 
-  --font-display: "Fredoka", ui-sans-serif, sans-serif;
-  --font-body: "Nunito Sans", ui-sans-serif, sans-serif;
+  --font-display: "Ramona", ui-sans-serif, sans-serif;
+  --font-body: "Reddit Sans", ui-sans-serif, sans-serif;
 }
