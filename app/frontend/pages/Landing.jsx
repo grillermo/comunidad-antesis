@@ -2,7 +2,7 @@ import { useForm } from '@inertiajs/react'
 import coverUrl from '../assets/cover.jpg'
 import TopMenu from '../components/TopMenu'
 
-export default function Landing({ subscribed, alreadySubscribed, source, user }) {
+export default function Landing({ subscribed, alreadySubscribed, source, user, manualPath }) {
   const form = useForm({ email: '', source: source || '' })
 
   const submit = (e) => {
@@ -28,6 +28,18 @@ export default function Landing({ subscribed, alreadySubscribed, source, user })
           <h1 className="mt-3 font-display text-4xl font-bold leading-[1.05] text-blue sm:text-5xl">
             Tiñe, extrae y pinta con lo que da la tierra
           </h1>
+
+          {user && (
+            <div className="mt-6 flex flex-col items-start gap-3 border border-blue/15 bg-white px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-blue-ink/80">Retoma donde te quedaste.</p>
+              <a
+                href={manualPath}
+                className="font-display shrink-0 bg-orange px-4 py-3 font-semibold text-white"
+              >
+                Continuar leyendo
+              </a>
+            </div>
+          )}
 
           {subscribed ? (
             <p role="status" className="mt-5 text-lg">
