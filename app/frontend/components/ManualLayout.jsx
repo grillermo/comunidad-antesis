@@ -41,7 +41,7 @@ export default function ManualLayout({ title, children, hideTitle = false }) {
               href="/manual-del-color-vivo"
               className="justify-self-center font-display text-sm font-semibold text-blue-ink"
             >
-              ↑ Contenido
+              ↑ Índice
             </Link>
             <div className="justify-self-end">
               <TopMenu user={user} />
