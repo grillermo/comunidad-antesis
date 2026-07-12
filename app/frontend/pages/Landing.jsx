@@ -1,5 +1,6 @@
-import { useForm, router } from '@inertiajs/react'
+import { useForm } from '@inertiajs/react'
 import coverUrl from '../assets/cover.jpg'
+import TopMenu from '../components/TopMenu'
 
 export default function Landing({ subscribed, alreadySubscribed, source, user }) {
   const form = useForm({ email: '', source: source || '' })
@@ -11,21 +12,9 @@ export default function Landing({ subscribed, alreadySubscribed, source, user })
 
   return (
     <main className="flex min-h-screen flex-col bg-cream font-body text-blue-ink">
-      <header className="mx-auto flex max-w-6xl items-center justify-end gap-4 px-6 py-4 text-sm">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-end gap-4 px-6 py-4 text-sm">
         {user ? (
-          <>
-            <span className="text-blue-ink/80">Hola, {user.email}</span>
-            {user.role === 'admin' && (
-              <a href="/antesis-admin" className="font-display font-semibold text-blue">Admin</a>
-            )}
-            <button
-              type="button"
-              onClick={() => router.delete('/users/sign_out')}
-              className="font-display font-semibold text-orange-ink"
-            >
-              Cerrar sesión
-            </button>
-          </>
+          <TopMenu user={user} />
         ) : (
           <a href="/users/sign_in" className="font-display font-semibold text-blue">Iniciar sesión</a>
         )}

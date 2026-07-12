@@ -2,13 +2,14 @@ import { useEffect } from 'react'
 import { Link, usePage, Deferred, router } from '@inertiajs/react'
 import CommentThread from './comments/CommentThread'
 import CommentsFallback from './comments/CommentsFallback'
+import TopMenu from './TopMenu'
 
 // Same 88 page files Vite already chunks — reused here to warm the next
 // section's module. import.meta.glob dedupes to the existing chunks.
 const pageModules = import.meta.glob('../pages/manual-del-color-vivo/**/*.jsx')
 
 export default function ManualLayout({ title, children, hideTitle = false }) {
-  const { section, nextPage } = usePage().props
+  const { section, nextPage, user } = usePage().props
 
   useEffect(() => {
     if (!nextPage) return
@@ -26,18 +27,24 @@ export default function ManualLayout({ title, children, hideTitle = false }) {
 
   return (
     <main className="min-h-screen bg-cream font-body text-blue-ink">
-      <div className="mx-auto max-w-3xl px-6 py-12">
-        <div className="flex items-center justify-between">
+      <div className="mx-auto max-w-3xl px-6 pb-12 pt-4">
+        <div className="grid grid-cols-3 items-center gap-4">
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="font-display text-sm font-semibold text-blue-ink"
+            className="justify-self-start font-display text-sm font-semibold text-blue-ink"
           >
             ← Atrás
           </button>
-          <Link href="/manual-del-color-vivo" className="font-display text-sm font-semibold text-blue-ink">
+          <Link
+            href="/manual-del-color-vivo"
+            className="justify-self-center font-display text-sm font-semibold text-blue-ink"
+          >
             ↑ Contenido
           </Link>
+          <div className="justify-self-end">
+            <TopMenu user={user} />
+          </div>
         </div>
         {hideTitle ? null : <h1 className="mt-4 font-display text-3xl font-bold text-orange">{title}</h1>}
         <div className="mt-6 space-y-5 text-[1.05rem] leading-8">{children}</div>

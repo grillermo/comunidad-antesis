@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react'
+import TopMenu from '../../components/TopMenu'
 
 function NodeList({ nodes, prefix }) {
   return (
@@ -18,9 +19,12 @@ function NodeList({ nodes, prefix }) {
   )
 }
 
-export default function Index({ contents }) {
+export default function Index({ contents, user }) {
   return (
-    <main className="min-h-screen bg-cream font-body text-blue-ink">
+    <main className="relative min-h-screen bg-cream font-body text-blue-ink">
+      <div className="absolute right-6 top-6">
+        <TopMenu user={user} />
+      </div>
       <div className="mx-auto max-w-3xl px-6 py-12">
         <p className="font-display text-xs font-semibold uppercase tracking-[0.14em] text-orange-ink">
           Manual del Color Vivo
