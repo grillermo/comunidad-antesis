@@ -42,6 +42,8 @@ class ManualController < InertiaController
   # Persist where the reader is so we can send them back here on next login.
   # update_column: a read-path write with no need for validations or timestamps.
   def remember_last_manual_path
+    return if request.headers["Purpose"] == "prefetch"
+
     user = Current.user
     return if user.nil? || user.last_manual_path == params[:component]
 

@@ -43,6 +43,14 @@ RSpec.describe "Manual", type: :request do
     expect(user.reload.last_manual_path).to eq("color-cotidiano/velas")
   end
 
+  it "does not record the last section for a prefetch request" do
+    sign_in user
+    get "/manual-del-color-vivo/color-cotidiano/velas",
+        headers: { "Purpose" => "prefetch" }
+
+    expect(user.reload.last_manual_path).to be_nil
+  end
+
   it "returns 404 for an unknown slug" do
     sign_in user
     # No route is drawn for unknown slugs; Rails' router raises
