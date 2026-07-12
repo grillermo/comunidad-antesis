@@ -120,8 +120,12 @@ import { Deferred } from '@inertiajs/react'
 - `CommentThread` reads `comments` from `usePage().props` instead of receiving
   it as a prop (or keep the prop and pass it through `usePage` in the layout —
   either way it only renders once loaded, so no undefined guard needed inside).
-- `CommentsFallback` is a lightweight skeleton (heading + a muted "Cargando
-  conversación…" line) sized to roughly match the thread, avoiding layout jump.
+- `CommentsFallback` renders the same section chrome (top border + "Conversación"
+  heading) so there's no layout jump, then a centered spinner: a Tailwind
+  `animate-spin` ring in brand colors (e.g. `h-6 w-6 rounded-full border-2
+  border-blue/20 border-t-orange`) beside a muted "Cargando conversación…" label.
+  Mark it `role="status"` with an `aria-label` for screen readers, and respect
+  `motion-reduce:animate-none`.
 - `section` stays a normal (non-deferred) prop, always present.
 
 ## Testing
