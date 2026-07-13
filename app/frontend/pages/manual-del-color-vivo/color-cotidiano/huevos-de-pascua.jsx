@@ -1,7 +1,6 @@
 import ManualLayout from '@/components/ManualLayout'
 import Recipe from '@/components/manual/Recipe'
 import Steps from '@/components/manual/Steps'
-import SideNote from '@/components/manual/SideNote'
 
 export default function Page({ title }) {
   return (
@@ -18,9 +17,8 @@ export default function Page({ title }) {
           <li>Coloca los cascarones en el tinte. Puedes mezclar varios tintes para obtener más colores.</li>
           <li>Déjalos reposar toda la noche dentro del tinte.</li>
           <li>Sácalos y déjalos secar.</li>
-          <li>Si quieres puedes hacer estampados con hojas ente sobre el huevo: envuélvelo con un pedazo de media o pantimedia y na liga, apretando para que ien pegada al cascarón. Sumerge el huevo envuelto en el tinte y ponlo a minutos. Cuando lo saques a, aparecerá la silueta clara de</li>
+          <li>Si quieres puedes hacer estampados con hojas o flores directamente sobre el huevo: envuélvelo con un pedazo de media o pantimedia y haz un nudo con una liga, apretando para que la planta quede bien pegada al cascarón. Sumerge el huevo envuelto en el tinte y ponlo a fuego bajo por 20 minutos. Cuando lo saques y retires la media, aparecerá la silueta clara de la planta.</li>
         </Steps>
-        <SideNote>la planta.</SideNote>
       </Recipe>
     </ManualLayout>
   )
