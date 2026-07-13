@@ -29,7 +29,7 @@ export default function Page({ title }) {
       <Recipe tiempo="40 horas aproximadamente, 2 horas de trabajo activo.">
         <Steps>
           <li>Lava o descruda la tela que quieres estampar. Si lo deseas, puedes hacer un baño de taninos para intensificar los colores y volverlos más resistentes a las lavadas o al sol, pero no es absolutamente necesario, especialmente si el colorante que vas a usar contiene taninos.</li>
-          <li>Coloca 10 gramos de materia vegetal con propiedades tintóreas —por ejemplo, palo de Campeche— en 200 ml de agua y déjala remojar al menos 12 horas.</li>
+          <li>Coloca 10 gramos de materia vegetal con propiedades tintóreas por ejemplo, palo de Campeche en 200 ml de agua y déjala remojar al menos 12 horas.</li>
           <li>Pon la mezcla a hervir a fuego bajo hasta que se reduzca a aproximadamente 50 ml, alrededor de media hora.</li>
           <li>Retira el material vegetal.</li>
           <li>Divide la tinta en dos recipientes con 25 ml de tinta cada uno.</li>

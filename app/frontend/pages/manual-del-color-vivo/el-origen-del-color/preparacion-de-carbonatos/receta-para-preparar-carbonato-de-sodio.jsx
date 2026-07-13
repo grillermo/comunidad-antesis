@@ -7,7 +7,7 @@ import SideNote from '@/components/manual/SideNote'
 export default function Page({ title }) {
   return (
     <ManualLayout title={title}>
-      <p>El carbonato de sodio es un compuesto inorgánico que se encuentra en la naturaleza como un mineral. Es la sustancia alcalina más utilizada desde la antigüedad. Yo lo utilizo para lavar a profundidad textiles —proceso conocido como descrudado— y para convertir un tinte líquido en pigmento en polvo. Lo puedes conseguir en internet, en tiendas naturistas, o convertir bicarbonato de sodio en carbonato con las siguientes instrucciones. Puedes utilizar las herramientas de tu cocina, pero lávalas muy bien al terminar.</p>
+      <p>El carbonato de sodio es un compuesto inorgánico que se encuentra en la naturaleza como un mineral. Es la sustancia alcalina más utilizada desde la antigüedad. Yo lo utilizo para lavar a profundidad textiles proceso conocido como descrudado y para convertir un tinte líquido en pigmento en polvo. Lo puedes conseguir en internet, en tiendas naturistas, o convertir bicarbonato de sodio en carbonato con las siguientes instrucciones. Puedes utilizar las herramientas de tu cocina, pero lávalas muy bien al terminar.</p>
       <Callout>
         <p>El carbonato de sodio no es tóxico, pero al ser alcalino, es muy irritante. Cuando lleves a cabo esta receta, evita inhalar los vapores, utiliza mascarilla, guantes de hule y trabaja al aire libre o con las ventanas abiertas y el extractor de cocina encendido. Una vez que esté listo, mantenlo fuera del alcance de los niños y animales. No debe ingerirse ni tocarse directamente con las manos.</p>
       </Callout>

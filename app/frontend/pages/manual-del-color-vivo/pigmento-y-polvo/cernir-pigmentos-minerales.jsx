@@ -18,9 +18,9 @@ export default function Page({ title }) {
           <li>Agita vigorosamente y deja reposar 5 segundos.</li>
           <li>Vierte esa agua turbia en otro recipiente, sin vaciar las piedras que se asentaron al fondo. Esta agua con color es el pigmento suspendido.</li>
           <li>Desecha todo lo que quedó en el fondo del primer recipiente.</li>
-          <li>Con ayuda de un colador retira todas las partículas que floten en el agua pigmentada del segundo recipiente. — Podrías encontrar restos de plantas, basura o insectos.</li>
+          <li>Con ayuda de un colador retira todas las partículas que floten en el agua pigmentada del segundo recipiente. Podrías encontrar restos de plantas, basura o insectos.</li>
           <li>Deja reposar por 12 horas.</li>
-          <li>Decanta el agua. — El pigmento se encuentra en el fondo.</li>
+          <li>Decanta el agua. El pigmento se encuentra en el fondo.</li>
           <li>Pon el recipiente con el sedimento al sol hasta que esté completamente seco.</li>
           <li>Muele el pigmento lo más fino posible.</li>
           <li>Almacénalo en un frasco con tapa.</li>

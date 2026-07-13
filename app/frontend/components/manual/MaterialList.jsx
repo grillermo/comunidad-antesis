@@ -6,7 +6,7 @@ export function Material({ term, children }) {
   return (
     <li className="pl-1 leading-7">
       <strong>{term}</strong>
-      {children ? <> — {children}</> : null}
+      {children ? <> {children}</> : null}
     </li>
   )
 }

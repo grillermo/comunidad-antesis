@@ -44,7 +44,7 @@ export default function Page({ title }) {
         <li>Cuando el tinte se haya vuelto de color verde amarillento, hay espuma azul y un poco de espuma cobriza en la parte superior (conocida como flor de índigo), el tinte está listo para teñir.</li>
         <li>Sumerge tu madeja, fibra o tela mojada en el tinte y mantenla sumergida durante un periodo de 3 a 15 minutos.</li>
         <li>Retira con cuidado la fibra, dejando que el exceso de líquido drene en una cubeta o recipiente que se verterá más tarde en la olla. Comenzarás a ver cómo la fibra cambia de verde oscuro a verde azulado y luego a azul.</li>
-        <li>Permite que la fibra se vuelva azul después de cada inmersión —sin áreas verdes azuladas o amarillentas— y deja que la fibra se airee durante al menos 5 minutos abriendo las madejas o extendiendo la tela.</li>
+        <li>Permite que la fibra se vuelva azul después de cada inmersión sin áreas verdes azuladas o amarillentas y deja que la fibra se airee durante al menos 5 minutos abriendo las madejas o extendiendo la tela.</li>
         <li>Continúa sumergiendo la fibra las veces que quieras hasta que esté dos tonos más oscura de lo que deseas.</li>
         <li>Cuando termines de teñir, vierte de regreso a la olla principal todo el exceso de tinte que haya quedado en las fibras y en los recipientes de drenado.</li>
         <li>Enjuaga la fibra solo con agua.</li>

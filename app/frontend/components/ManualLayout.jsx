@@ -4,7 +4,7 @@ import CommentThread from './comments/CommentThread'
 import CommentsFallback from './comments/CommentsFallback'
 import TopMenu from './TopMenu'
 
-// Same 88 page files Vite already chunks — reused here to warm the next
+// Same 88 page files Vite already chunks reused here to warm the next
 // section's module. import.meta.glob dedupes to the existing chunks.
 const pageModules = import.meta.glob('../pages/manual-del-color-vivo/**/*.jsx')
 
