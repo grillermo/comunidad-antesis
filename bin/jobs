@@ -1,5 +1,16 @@
 #!/usr/bin/env ruby
 
+# Unbuffered output so job logs stream when stdout is a pipe (./serve runs us under `parallel`)
+$stdout.sync = true
+$stderr.sync = true
+
+# macOS forks unsafely once the ObjC runtime is initialized; SolidQueue's
+# supervisor forks worker processes, so disable the fork-safety guard.
+ENV["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] ||= "YES"
+
+# Run two worker processes by default (override with JOB_CONCURRENCY).
+ENV["JOB_CONCURRENCY"] ||= "2"
+
 require_relative "../config/environment"
 require "solid_queue/cli"
 
