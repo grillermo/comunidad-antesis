@@ -53,8 +53,9 @@ export default function Landing({ subscribed, alreadySubscribed, source, user, m
             <>
               <p className="mt-4 text-[15px] leading-relaxed text-blue-ink/90">
                 Más de una década de fórmulas para dar color con plantas,
-                minerales e insectos. Déjanos tu correo y recibe un descuento
-                para el ebook completo.
+                minerales e insectos, a punto de salir en un solo libro.
+                Déjanos tu correo y sé de los primeros en enterarte el día
+                del lanzamiento —con un descuento de regalo por acompañarnos.
               </p>
 
               <form onSubmit={submit} className="mt-6 flex max-w-sm gap-2" noValidate>
@@ -77,7 +78,7 @@ export default function Landing({ subscribed, alreadySubscribed, source, user, m
                   disabled={form.processing}
                   className="font-display bg-orange px-4 py-3 font-semibold text-white disabled:opacity-60"
                 >
-                  Quiero mi descuento
+                  Avísenme del lanzamiento
                 </button>
               </form>
 
@@ -88,7 +89,7 @@ export default function Landing({ subscribed, alreadySubscribed, source, user, m
               )}
 
               <p className="mt-3 text-xs text-blue-ink/70">
-                Sin spam. Solo el descuento y el aviso de lanzamiento.
+                Sin spam. Solo el aviso de lanzamiento y tu descuento.
               </p>
             </>
           )}
