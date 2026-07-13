@@ -1,6 +1,20 @@
 RailsAdmin.config do |config|
   config.asset_source = :vite
 
+  config.excluded_models = %w[
+    SolidQueue::Job
+    SolidQueue::ScheduledExecution
+    SolidQueue::ReadyExecution
+    SolidQueue::ClaimedExecution
+    SolidQueue::BlockedExecution
+    SolidQueue::FailedExecution
+    SolidQueue::RecurringExecution
+    SolidQueue::RecurringTask
+    SolidQueue::Pause
+    SolidQueue::Process
+    SolidQueue::Semaphore
+  ]
+
   ### Popular gems integration
   config.authenticate_with do
     warden.authenticate! scope: :user
