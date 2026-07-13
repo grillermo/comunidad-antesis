@@ -24,7 +24,7 @@ class Users::SessionsController < Devise::SessionsController
   def after_sign_in_path_for(resource)
     stored_location_for(resource) ||
       Manual.url_for(resource.last_manual_path) ||
-      "/manual-del-color-vivo"
+      Manual::GLOSSARY_PATH
   end
 
   # Let Warden redirect failed sign-ins so the Inertia page receives the alert.
