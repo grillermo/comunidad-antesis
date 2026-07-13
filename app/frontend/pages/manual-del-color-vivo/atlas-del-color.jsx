@@ -193,7 +193,7 @@ function SortableTable() {
                   >
                     <span>{col.label}</span>
                     <span className="text-xs" aria-hidden="true">
-                      {active ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+                      {active ? (sortDir === 'asc' ? '▲' : '▼') : ''}
                     </span>
                   </button>
                 </th>
