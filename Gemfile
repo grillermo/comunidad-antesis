@@ -66,7 +66,7 @@ gem "http", "~> 6.0"
 gem "devise", "~> 5.0"
 
 gem "ancestry", "~> 4.3"
-gem "commonmarker", "~> 1.1"
+gem "commonmarker", "~> 2.8"
 
 gem "rails_admin", "~> 3.3"
 
