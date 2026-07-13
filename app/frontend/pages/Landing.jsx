@@ -55,7 +55,7 @@ export default function Landing({ subscribed, alreadySubscribed, source, user, m
                 Más de una década de fórmulas para dar color con plantas,
                 minerales e insectos, a punto de salir en un solo libro.
                 Déjanos tu correo y sé de los primeros en enterarte el día
-                del lanzamiento —con un descuento de regalo por acompañarnos.
+                del lanzamiento con un descuento de regalo por acompañarnos.
               </p>
 
               <form onSubmit={submit} className="mt-6 flex max-w-sm gap-2" noValidate>
