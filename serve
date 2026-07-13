@@ -1,26 +1,174 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Load environment variables
+APP_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$APP_DIR"
+
+# Load environment variables (for this deploy script: git/bundle/migrate steps).
 set -a
+# shellcheck source=/dev/null
 [ -f .env ] && . .env
 set +a
 
 export RAILS_ENV="${RAILS_ENV:-production}"
-export RAILS_LOG_TO_STDOUT="${RAILS_LOG_TO_STDOUT:-1}"
-export RAILS_SERVE_STATIC_FILES="${RAILS_SERVE_STATIC_FILES:-true}"
-export RAILS_PORT="${RAILS_PORT:-4020}"
 
-# Build assets (assets:precompile runs Vite, including RailsAdmin at /antesis-admin)
+SESSION=antesis
+BLUE_PORT=4021
+GREEN_PORT=4022
+
+# Both web slots serve at once; Caddy round-robins across them (see
+# /Users/grillermo/c/server/Caddyfile :4020). Deploy is a rolling restart:
+# respawn one web pane while the other keeps serving, then swap.
+#
+# End state: ONE detached tmux session "antesis" with four panes —
+#   blue  : Rails web on $BLUE_PORT
+#   green : Rails web on $GREEN_PORT
+#   jobs  : Solid Queue worker (bin/jobs)
+#   ssr   : Vite SSR server (bin/vite ssr)
+#
+# CRITICAL: tmux panes do NOT inherit this script's environment. When a tmux
+# server is already running, `new-session`/`split-window` commands get the
+# server's (stale) environment, so DATABASE_*, PATH (ruby shims) etc. would be
+# missing and Rails would fail to boot. Every pane command therefore
+# re-sources .env and carries this shell's PATH itself.
+ENV_SETUP="cd $APP_DIR && export PATH='$PATH' && set -a && . ./.env && set +a && export RAILS_ENV=production RAILS_LOG_TO_STDOUT=1 RAILS_SERVE_STATIC_FILES=true"
+
+web_cmd() {
+  local slot="$1" port="$2"
+  echo "$ENV_SETUP && export SLOT=$slot PORT=$port && exec bin/rails server -p $port"
+}
+
+jobs_cmd() {
+  echo "$ENV_SETUP && exec bin/jobs"
+}
+
+ssr_cmd() {
+  echo "$ENV_SETUP && exec bin/vite ssr"
+}
+
+slot_healthy() {
+  curl -sf "http://localhost:$1/health" 2>/dev/null | jq -e '.status == "ok"' > /dev/null 2>&1
+}
+
+# Find a pane by its title within the session ("" if absent).
+# Guard on has-session: without it, list-panes exits 1 on a missing session,
+# pipefail propagates that 1, and `pid=$(pane_for ...)` under `set -e` aborts
+# the whole script on the very first start_pane (fresh run, no session yet).
+pane_for() {
+  tmux has-session -t "$SESSION" 2>/dev/null || return 0
+  tmux list-panes -t "$SESSION" -F '#{pane_title} #{pane_id}' 2>/dev/null \
+    | awk -v t="$1" '$1==t{print $2}'
+}
+
+# Start or replace a single pane (identified by title) with the given command.
+# Replacing an existing pane (respawn-pane -k) leaves the OTHER panes running,
+# which is what keeps the deploy a rolling restart.
+start_pane() {
+  local title="$1" cmd="$2"
+  local pid
+  pid=$(pane_for "$title")
+
+  if [ -z "$pid" ]; then
+    if tmux has-session -t "$SESSION" 2>/dev/null; then
+      pid=$(tmux split-window -P -F '#{pane_id}' -t "$SESSION")
+    else
+      tmux new-session -d -s "$SESSION" -n main
+      pid=$(tmux list-panes -t "$SESSION" -F '#{pane_id}' | head -1)
+    fi
+    tmux select-pane -t "$pid" -T "$title"
+  fi
+
+  tmux respawn-pane -k -t "$pid" "$cmd"
+  tmux select-layout -t "$SESSION" tiled > /dev/null
+}
+
+wait_healthy() {
+  local port="$1" slot="$2"
+  echo "==> Waiting for $slot on port $port..."
+  for _ in $(seq 1 45); do
+    if slot_healthy "$port"; then
+      # Validate reported port matches the slot we expect.
+      local reported
+      reported=$(curl -sf "http://localhost:$port/health" | jq -r '.port')
+      if [ "$reported" != "$port" ]; then
+        echo "ERROR: Port mismatch on $slot. Expected $port, health reports $reported."
+        return 1
+      fi
+      echo "==> $slot healthy (port $port)"
+      return 0
+    fi
+    sleep 2
+  done
+  echo "ERROR: $slot failed health check after 90s."
+  echo "----- last lines of $slot pane -----"
+  tmux capture-pane -p -t "$(pane_for "$slot")" 2>/dev/null | tail -n 20 || true
+  return 1
+}
+
+restart_web() {
+  local slot="$1" port="$2"
+  echo "==> (Re)starting $slot web pane (port $port)"
+  start_pane "$slot" "$(web_cmd "$slot" "$port")"
+  wait_healthy "$port" "$slot" || exit 1
+}
+
+# A pane whose command exits is removed by tmux (remain-on-exit defaults off),
+# so if the process crashed on boot the pane disappears. Give it a moment,
+# then confirm the pane is still there.
+verify_pane() {
+  local title="$1"
+  echo "==> Verifying $title pane..."
+  sleep 3
+  if [ -z "$(pane_for "$title")" ]; then
+    echo "ERROR: $title pane not running (crashed on boot)."
+    return 1
+  fi
+  echo "==> $title pane running"
+}
+
+# 1. Store current commit for rollback, then pull
+git -C "$APP_DIR" rev-parse HEAD > /tmp/antesis_prev_commit
+echo "==> git pull"
+git -C "$APP_DIR" pull github main
+
+# 2. Install deps + build assets + migrate ONCE, with old slots still serving
+echo "==> bundle install"
+bundle install
+echo "==> npm install"
+npm install
+echo "==> assets:precompile"
+# No assets:clobber — old slots still serve old digested files mid-deploy.
+# assets:precompile runs Vite (including RailsAdmin at /antesis-admin).
 bin/rails assets:precompile
+echo "==> db:migrate"
+bin/rails db:migrate
 
-# Run the three processes in parallel, interleaved to this terminal.
-# --color           : give each process its own colour.
-# --colsep/--tagstring : tab-split "label<TAB>command"; tag each line with label.
-# --line-buffer     : stream output line-by-line (no per-job buffering).
-# --halt now,done=1 : if any process exits, kill the rest and stop.
-parallel --color --line-buffer --colsep '\t' --tagstring '{1}' --halt now,done=1 '{2}' ::: \
-  'rails-4021	bin/rails server -p 4021' \
-  'rails-4022	bin/rails server -p 4022' \
-  'jobs	bin/jobs' \
-  'ssr	bin/vite ssr'
+# 3. Rolling restart: one web pane at a time so the other keeps serving.
+#    Caddy skips the down slot (active health checks + fail_duration).
+restart_web blue  "$BLUE_PORT"
+restart_web green "$GREEN_PORT"
+
+# 4. (Re)start the standalone Solid Queue worker pane.
+echo "==> (Re)starting jobs pane"
+start_pane jobs "$(jobs_cmd)"
+verify_pane jobs || exit 1
+
+# 5. (Re)start the Vite SSR pane.
+echo "==> (Re)starting ssr pane"
+start_pane ssr "$(ssr_cmd)"
+verify_pane ssr || exit 1
+
+echo "==> Deploy complete. Session '$SESSION': blue:$BLUE_PORT, green:$GREEN_PORT, jobs, ssr."
+
+# 6. Attach so the operator sees blue/green/jobs/ssr output live.
+#    switch-client if already inside tmux; plain attach otherwise. When run
+#    non-interactively (no TTY) attaching would fail, so skip it then.
+if [ -n "${TMUX:-}" ]; then
+  echo "==> Switching client to session '$SESSION'"
+  tmux switch-client -t "$SESSION"
+elif [ -t 1 ]; then
+  echo "==> Attaching to session '$SESSION' (detach with Ctrl-b d)"
+  tmux attach-session -t "$SESSION"
+else
+  echo "==> No TTY; not attaching. Run: tmux attach -t $SESSION"
+fi

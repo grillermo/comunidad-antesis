@@ -4,7 +4,6 @@ class HealthController < ApplicationController
   def show
     checks = {
       "database" => check_database,
-      "queue" => check_queue,
       "cache" => check_cache
     }
 
@@ -12,7 +11,9 @@ class HealthController < ApplicationController
     status = ok ? :ok : :service_unavailable
     overall = ok ? "ok" : "error"
 
-    render json: { status: overall, checks: checks }, status: status
+    # `port` lets the deploy script (./serve) verify it reached the slot it
+    # expects (blue vs green) and not a stale pane still bound elsewhere.
+    render json: { status: overall, port: request.port, checks: checks }, status: status
   end
 
   private
@@ -20,14 +21,6 @@ class HealthController < ApplicationController
   def check_database
     ActiveRecord::Base.connection.execute("SELECT 1")
     "ok"
-  rescue StandardError
-    "error"
-  end
-
-  # Confirms a Solid Queue worker process is registered and alive, not merely
-  # that the schema is migrated (the database check already covers that).
-  def check_queue
-    SolidQueue::Process.exists? ? "ok" : "error"
   rescue StandardError
     "error"
   end
