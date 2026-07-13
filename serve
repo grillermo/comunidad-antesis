@@ -20,6 +20,7 @@ bin/rails assets:precompile
 # --line-buffer     : stream output line-by-line (no per-job buffering).
 # --halt now,done=1 : if any process exits, kill the rest and stop.
 parallel --color --line-buffer --colsep '\t' --tagstring '{1}' --halt now,done=1 '{2}' ::: \
-  'rails	bin/rails server -p "$RAILS_PORT" -b 0.0.0.0' \
+  'rails-4021	bin/rails server -p 4021' \
+  'rails-4022	bin/rails server -p 4022' \
   'jobs	bin/jobs' \
   'ssr	bin/vite ssr'
