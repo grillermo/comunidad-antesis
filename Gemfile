@@ -69,3 +69,5 @@ gem "ancestry", "~> 4.3"
 gem "commonmarker", "~> 1.1"
 
 gem "rails_admin", "~> 3.3"
+
+gem "mailgun-ruby", "~> 1.4"
