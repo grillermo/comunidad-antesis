@@ -78,8 +78,9 @@ GEM
       uri (>= 0.13.1)
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
-    ancestry (4.3.3)
+    ancestry (5.1.0)
       activerecord (>= 5.2.6)
+      logger
     ast (2.4.3)
     base64 (0.3.0)
     bcrypt (3.1.22)
@@ -435,7 +436,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  ancestry (~> 4.3)
+  ancestry (~> 5.1)
   bootsnap
   brakeman
   commonmarker (~> 1.1)
@@ -477,7 +478,7 @@ CHECKSUMS
   activestorage (8.0.5) sha256=25898a3f8f8aced15ea6a8578cb56955acf3a96ad931e000b2e77e9c8db43df3
   activesupport (8.0.5) sha256=37f213ff6a37cf3fadfa1a28c1a9678e2cb73b59bb9ebd0eeeca653cccadcb23
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
-  ancestry (4.3.3) sha256=af3f6bcf405c219af02eec5b9c8206e68cba8d7976fe5269559ef0986f5e7ca0
+  ancestry (5.1.0) sha256=8a073cf6f7e306eeed36af72595abd19602ef4a197bf4beda2f31cf8f55de27b
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
   bcrypt (3.1.22) sha256=1f0072e88c2d705d94aff7f2c5cb02eb3f1ec4b8368671e19112527489f29032
