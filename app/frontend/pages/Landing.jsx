@@ -43,7 +43,7 @@ export default function Landing({ subscribed, alreadySubscribed, source, user, m
 
           {subscribed ? (
             <p role="status" className="mt-5 text-lg">
-              ¡Listo! Te avisaremos y te enviaremos tu descuento.
+              ¡Listo! Te avisaremos del lanzamiento.
             </p>
           ) : alreadySubscribed ? (
             <p role="status" className="mt-5 text-lg">
@@ -55,7 +55,7 @@ export default function Landing({ subscribed, alreadySubscribed, source, user, m
                 Más de una década de fórmulas para dar color con plantas,
                 minerales e insectos, a punto de salir en un solo libro.
                 Déjanos tu correo y sé de los primeros en enterarte el día
-                del lanzamiento con un descuento de regalo por acompañarnos.
+                del lanzamiento.
               </p>
 
               <form onSubmit={submit} className="mt-6 flex max-w-sm gap-2" noValidate>
@@ -89,7 +89,7 @@ export default function Landing({ subscribed, alreadySubscribed, source, user, m
               )}
 
               <p className="mt-3 text-xs text-blue-ink/70">
-                Sin spam. Solo el aviso de lanzamiento y tu descuento.
+                Sin spam. Solo el aviso de lanzamiento.
               </p>
             </>
           )}
