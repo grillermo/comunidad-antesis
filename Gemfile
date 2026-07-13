@@ -52,6 +52,11 @@ gem "dotenv-rails", "~> 3.2", groups: [ :development, :test ]
 
 gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]
 
+group :test do
+  gem "vcr", "~> 6.3"
+  gem "webmock", "~> 3.23"
+end
+
 gem "inertia_rails", "~> 3.21"
 
 gem "vite_rails", "~> 3.11"

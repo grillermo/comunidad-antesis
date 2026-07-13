@@ -3,6 +3,7 @@ class NewsletterEmailsController < InertiaController
     record = NewsletterEmail.new(newsletter_email_params)
 
     if record.save
+      enqueue_mailerlite(record)
       redirect_to root_path, flash: { subscribed: true }
     elsif duplicate?(record)
       redirect_to root_path, flash: { already_subscribed: true }
@@ -21,5 +22,9 @@ class NewsletterEmailsController < InertiaController
 
   def duplicate?(record)
     record.errors.of_kind?(:email, :taken)
+  end
+
+  def enqueue_mailerlite(record)
+    NewsletterSubscriptionJob.perform_later(record.email, source: record.source)
   end
 end

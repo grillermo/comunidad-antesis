@@ -1,0 +1,63 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://connect.mailerlite.com/api/groups?filter%5Bname%5D=pre-launch
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Authorization:
+      - <MAILERLITE_API_TOKEN>
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+    body:
+      encoding: UTF-8
+      string: '{"data":[]}'
+  recorded_at: Mon, 13 Jul 2026 00:00:00 GMT
+- request:
+    method: post
+    uri: https://connect.mailerlite.com/api/groups
+    body:
+      encoding: UTF-8
+      string: '{"name":"pre-launch"}'
+    headers:
+      Authorization:
+      - <MAILERLITE_API_TOKEN>
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+    body:
+      encoding: UTF-8
+      string: '{"data":{"id":"111","name":"pre-launch"}}'
+  recorded_at: Mon, 13 Jul 2026 00:00:00 GMT
+- request:
+    method: post
+    uri: https://connect.mailerlite.com/api/subscribers
+    body:
+      encoding: UTF-8
+      string: '{"email":"reader@example.com","groups":["111"],"fields":{"source":"ig"}}'
+    headers:
+      Authorization:
+      - <MAILERLITE_API_TOKEN>
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+    body:
+      encoding: UTF-8
+      string: '{"data":{"id":"999","email":"reader@example.com"}}'
+  recorded_at: Mon, 13 Jul 2026 00:00:00 GMT
+recorded_with: VCR 6.3.1
