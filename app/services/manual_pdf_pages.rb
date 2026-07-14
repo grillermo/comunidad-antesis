@@ -38,11 +38,15 @@ class ManualPdfPages
     FileUtils.mkdir_p(@cache_dir)
     prefix = @cache_dir.join("rendering-#{@page}-#{Process.pid}")
 
-    _stdout, stderr, status = Open3.capture3(
-      "pdftoppm", "-f", @page.to_s, "-l", @page.to_s,
-      "-singlefile", "-r", RESOLUTION_DPI.to_s, "-png",
-      @source.to_s, prefix.to_s
-    )
+    begin
+      _stdout, stderr, status = Open3.capture3(
+        "pdftoppm", "-f", @page.to_s, "-l", @page.to_s,
+        "-singlefile", "-r", RESOLUTION_DPI.to_s, "-png",
+        @source.to_s, prefix.to_s
+      )
+    rescue SystemCallError => e
+      raise Error, "pdftoppm could not be launched: #{e.message}"
+    end
 
     rendered = Pathname.new("#{prefix}.png")
     unless status.success? && rendered.exist?
@@ -51,6 +55,6 @@ class ManualPdfPages
 
     FileUtils.mv(rendered, cached)
   rescue SystemCallError => e
-    raise Error, "pdftoppm could not be launched: #{e.message}"
+    raise Error, "cache filesystem error for page #{@page}: #{e.message}"
   end
 end

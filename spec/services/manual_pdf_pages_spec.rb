@@ -50,4 +50,13 @@ RSpec.describe ManualPdfPages do
       described_class.new(3, cache_dir: @cache_dir).path
     }.to raise_error(ManualPdfPages::Error, /launched/)
   end
+
+  it "reports cache filesystem errors accurately" do
+    invalid_cache_dir = @cache_dir.join("not-a-directory")
+    invalid_cache_dir.binwrite("occupied")
+
+    expect {
+      described_class.new(3, cache_dir: invalid_cache_dir).path
+    }.to raise_error(ManualPdfPages::Error, /cache filesystem error/i)
+  end
 end

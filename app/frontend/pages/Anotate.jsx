@@ -34,14 +34,18 @@ const markerClasses =
   "text-sm font-semibold text-red-600 underline";
 
 function Marker({ marker, onDelete }) {
+  const pending = marker.pending === true;
+
   return (
     <span
       onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => {
         e.stopPropagation();
-        onDelete(marker);
+        if (!pending) onDelete(marker);
       }}
-      className={`${markerClasses} cursor-pointer`}
+      className={`${markerClasses} ${
+        pending ? "cursor-default opacity-70" : "cursor-pointer"
+      }`}
       style={{ left: `${marker.x * 100}%`, top: `${marker.y * 100}%` }}
     >
       {MARKER_TEXT}
@@ -52,8 +56,19 @@ function Marker({ marker, onDelete }) {
 function Page({ page, aspect, markers, onPlace, onDelete }) {
   const containerRef = useRef(null);
   const pressRef = useRef(null);
+  const pointerRef = useRef(null);
   const draggingRef = useRef(false);
   const [provisional, setProvisional] = useState(null);
+
+  useEffect(
+    () => () => {
+      if (pressRef.current) clearTimeout(pressRef.current.timer);
+      pressRef.current = null;
+      pointerRef.current = null;
+      draggingRef.current = false;
+    },
+    []
+  );
 
   // While dragging a provisional marker, block touch scrolling so the
   // drag tracks the finger instead of panning the document.
@@ -73,48 +88,65 @@ function Page({ page, aspect, markers, onPlace, onDelete }) {
     };
   };
 
-  const cancelPress = () => {
+  const clearInteraction = () => {
     if (pressRef.current) clearTimeout(pressRef.current.timer);
     pressRef.current = null;
+    draggingRef.current = false;
+    setProvisional(null);
+
+    const pointerId = pointerRef.current;
+    pointerRef.current = null;
+    if (
+      pointerId !== null &&
+      containerRef.current?.hasPointerCapture(pointerId)
+    ) {
+      containerRef.current.releasePointerCapture(pointerId);
+    }
   };
 
   const handlePointerDown = (e) => {
-    if (draggingRef.current) return;
+    if (pointerRef.current !== null) return;
     const { clientX, clientY, pointerId } = e;
+    containerRef.current.setPointerCapture(pointerId);
+    pointerRef.current = pointerId;
     pressRef.current = {
       startX: clientX,
       startY: clientY,
       timer: setTimeout(() => {
+        if (pointerRef.current !== pointerId) return;
         pressRef.current = null;
         draggingRef.current = true;
-        containerRef.current.setPointerCapture(pointerId);
         setProvisional(fractionFor(clientX, clientY));
       }, LONG_PRESS_MS),
     };
   };
 
   const handlePointerMove = (e) => {
+    if (e.pointerId !== pointerRef.current) return;
     if (draggingRef.current) {
       setProvisional(fractionFor(e.clientX, e.clientY));
     } else if (pressRef.current) {
       const dx = e.clientX - pressRef.current.startX;
       const dy = e.clientY - pressRef.current.startY;
-      if (Math.hypot(dx, dy) > MOVE_TOLERANCE_PX) cancelPress();
+      if (Math.hypot(dx, dy) > MOVE_TOLERANCE_PX) clearInteraction();
     }
   };
 
   const handlePointerUp = (e) => {
-    cancelPress();
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
-    setProvisional(null);
-    onPlace(page, fractionFor(e.clientX, e.clientY));
+    if (e.pointerId !== pointerRef.current) return;
+    const position = draggingRef.current
+      ? fractionFor(e.clientX, e.clientY)
+      : null;
+    clearInteraction();
+    if (position) onPlace(page, position);
   };
 
-  const handlePointerCancel = () => {
-    cancelPress();
-    draggingRef.current = false;
-    setProvisional(null);
+  const handlePointerCancel = (e) => {
+    if (e.pointerId === pointerRef.current) clearInteraction();
+  };
+
+  const handleLostPointerCapture = (e) => {
+    if (e.pointerId === pointerRef.current) clearInteraction();
   };
 
   return (
@@ -126,6 +158,7 @@ function Page({ page, aspect, markers, onPlace, onDelete }) {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
+      onLostPointerCapture={handleLostPointerCapture}
       onContextMenu={(e) => e.preventDefault()}
     >
       <img
@@ -157,7 +190,7 @@ export default function Anotate({ pageCount, pageAspect, markers: initialMarkers
   const [markers, setMarkers] = useState(initialMarkers);
 
   const place = async (page, { x, y }) => {
-    const temp = { id: `temp-${Date.now()}`, page, x, y };
+    const temp = { id: `temp-${Date.now()}`, page, x, y, pending: true };
     setMarkers((current) => [...current, temp]);
     try {
       const saved = await apiCreateMarker({ page, x, y });
@@ -171,6 +204,7 @@ export default function Anotate({ pageCount, pageAspect, markers: initialMarkers
   };
 
   const remove = async (marker) => {
+    if (marker.pending) return;
     setMarkers((current) => current.filter((m) => m.id !== marker.id));
     try {
       await apiDeleteMarker(marker.id);
