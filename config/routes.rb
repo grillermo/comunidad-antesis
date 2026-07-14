@@ -7,6 +7,12 @@ Rails.application.routes.draw do
     mount RailsAdmin::Engine => "/antesis-admin", as: "rails_admin"
   end
 
+  authenticate :user, ->(user) { user.admin? } do
+    get "/anotate", to: "anotate#show"
+    get "/anotate/pages/:page", to: "anotate/pages#show", as: :anotate_page
+    resources :pdf_markers, only: [ :create, :destroy ], path: "anotate/markers"
+  end
+
   root "landing#index"
 
   get "generate-pdf", to: "generated_pdfs#show"
