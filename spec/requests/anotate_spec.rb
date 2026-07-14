@@ -84,6 +84,7 @@ RSpec.describe "Anotate", type: :request do
       get "/anotate/pages/1"
 
       expect(response).to have_http_status(:service_unavailable)
+      expect(response.headers["Cache-Control"]).to eq("no-cache")
     end
   end
 end

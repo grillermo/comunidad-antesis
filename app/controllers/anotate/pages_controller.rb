@@ -4,8 +4,9 @@ module Anotate
       page = Integer(params[:page], exception: false)
       raise ActiveRecord::RecordNotFound unless page&.between?(1, ManualPdfPages::PAGE_COUNT)
 
+      path = ManualPdfPages.path_for(page)
       expires_in 1.year
-      send_file ManualPdfPages.path_for(page), type: "image/png", disposition: "inline"
+      send_file path, type: "image/png", disposition: "inline"
     rescue ManualPdfPages::Error => e
       Rails.logger.error("ManualPdfPages failed: #{e.message}")
       head :service_unavailable
