@@ -29,7 +29,7 @@ async function main() {
     color: AUTHOR_BLUE,
   })
 
-  process.stdout.write(await doc.save())
+  process.stdout.write(await doc.save({ useObjectStreams: false }))
 }
 
 main().catch((err) => {
