@@ -13,4 +13,10 @@ RSpec.describe ManualPdfStamper do
 
     expect { stamper.call }.to raise_error(ManualPdfStamper::Error)
   end
+
+  it "raises Error when the stamp script cannot be launched" do
+    allow(Open3).to receive(:capture3).and_raise(Errno::ENOENT)
+
+    expect { described_class.new(email: "reader@example.com").call }.to raise_error(ManualPdfStamper::Error)
+  end
 end

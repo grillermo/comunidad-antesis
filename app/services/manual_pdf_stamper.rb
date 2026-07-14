@@ -22,5 +22,7 @@ class ManualPdfStamper
     end
 
     stdout
+  rescue SystemCallError => e
+    raise Error, "stamp script could not be launched: #{e.message}"
   end
 end
