@@ -44,7 +44,8 @@ Sell the "Manual del Color Vivo" ebook as a one-time $30 USD purchase through St
 - Content (all user-facing copy in Spanish):
   - Pitch written from the introduction of `data/manual.pdf` (read at implementation time; user vetoes copy).
   - Preview: the manual's table of contents plus one representative recipe rendered inline.
-  - Price ($30 USD) and a "Comprar el manual" button.
+  - Price ($30 USD) and a "Comprar el manual" button. Signed-in users see a link to the manual instead of the buy button.
+  - Recipe selection criterion: a short, visually representative recipe from early chapters (implementer picks; user vetoes).
 - The button POSTs to `/checkout` → `CheckoutsController#create`:
   - Returns 404 unless `SalesLaunch.live?`.
   - Creates `Stripe::Checkout::Session` with `mode: "payment"`, the configured price ID, `success_url: <app>/gracias-por-tu-compra?session_id={CHECKOUT_SESSION_ID}`, `cancel_url` back to home. Stripe captures `customer_email` itself.
@@ -55,13 +56,14 @@ Sell the "Manual del Color Vivo" ebook as a one-time $30 USD purchase through St
 - New table `purchases`: `stripe_session_id` (string, unique index, null: false), `email` (null: false), `user_id` (FK), `fulfilled_at` (datetime, nullable), timestamps.
 - `Purchase.record!(session)` — the single shared entry point for both post-purchase paths:
   - Runs in a transaction.
-  - `Purchase.create_or_find_by(stripe_session_id:)`, storing the session's email.
-  - `User.find_or_create_by(email:)` with a random `Devise.friendly_token` password (users.email unique index arbitrates races).
+  - Email comes from `session.customer_details.email` (NOT `customer_email`, which is only the pre-fill field).
+  - `Purchase.create_or_find_by(stripe_session_id:)`, storing the email.
+  - `User.find_or_create_by(email:)` with a random `Devise.friendly_token` password (users.email unique index arbitrates races); sets `purchase.user_id` to that user.
   - Returns the purchase (with associated user).
 - `PurchaseFulfillmentJob` (Solid Queue):
   - Locks the purchase row; returns early if `fulfilled_at` is set (makes webhook retries and double-enqueues safe).
-  - Generates the stamped PDF via `ManualPdfStamper.new(email: purchase.email).call`.
-  - Sends `PurchaseMailer#fulfillment`.
+  - Generates the stamped PDF via `ManualPdfStamper.new(email: purchase.email).call`. On `ManualPdfStamper::Error` the job raises and relies on Solid Queue retry; `fulfilled_at` stays unset so the guard holds.
+  - Sends `PurchaseMailer#fulfillment` with `deliver_now` (inside the job), so `fulfilled_at` is only set after actual delivery.
   - Sets `fulfilled_at`.
 
 ## 6. Webhook
@@ -74,8 +76,8 @@ Sell the "Manual del Color Vivo" ebook as a one-time $30 USD purchase through St
 ## 7. Gracias page
 
 - `GET /gracias-por-tu-compra?session_id=...` (`ThankYouController` or similar):
-  - Retrieves the Checkout Session from Stripe; requires `payment_status == "paid"`, else redirects to root.
-  - Calls `Purchase.record!` (covers the webhook-not-yet-arrived race) and enqueues `PurchaseFulfillmentJob` if unfulfilled (job is idempotent, so double-enqueue is harmless).
+  - Missing `session_id`, Stripe retrieval error (invalid ID), or `payment_status != "paid"` → redirect to root.
+  - Calls `Purchase.record!` (covers the webhook-not-yet-arrived race) and unconditionally enqueues `PurchaseFulfillmentJob` (job is idempotent, so double-enqueue is harmless).
   - Signs the user in (`sign_in(user)`).
   - Renders an Inertia thank-you page: "Descargar el manual" button pointing at the existing `GeneratedPdfsController` route, plus a link to the web manual.
 
