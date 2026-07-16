@@ -1,6 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "Landing shared user prop", type: :request do
+  around do |example|
+    travel_to Date.new(2026, 8, 14) do
+      example.run
+    end
+  end
+
   it "exposes no user prop when anonymous" do
     get "/"
     expect(response).to have_http_status(:ok)
