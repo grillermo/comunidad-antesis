@@ -52,4 +52,5 @@ node_modules
 
 # Brainstorming visual companion (local only)
 .superpowers/
+.worktrees/
 .tokensave
