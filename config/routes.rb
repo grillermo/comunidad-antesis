@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   root "landing#index"
 
   get "generate-pdf", to: "generated_pdfs#show"
+  get "/acceso/:token", to: "accesos#show", as: :acceso
 
   get "/manual-del-color-vivo", to: "manual#index", as: :manual
   Manual.walk do |_node, path|
