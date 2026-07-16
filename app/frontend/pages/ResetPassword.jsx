@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react'
 
-export default function ResetPassword({ resetPasswordToken, alert }) {
+export default function ResetPassword({ resetPasswordToken, alert, errors = {} }) {
   const form = useForm({
     reset_password_token: resetPasswordToken,
     password: '',
@@ -35,8 +35,15 @@ export default function ResetPassword({ resetPasswordToken, alert }) {
               required
               value={form.data.password}
               onChange={(e) => form.setData('password', e.target.value)}
+              aria-invalid={errors.password ? 'true' : undefined}
+              aria-describedby={errors.password ? 'password-error' : undefined}
               className="w-full border border-blue/20 bg-white px-3 py-3 text-[15px] outline-none focus:border-orange"
             />
+            {errors.password && (
+              <p id="password-error" role="alert" className="mt-1 text-sm text-orange-ink">
+                {Array.isArray(errors.password) ? errors.password[0] : errors.password}
+              </p>
+            )}
           </div>
 
           <div>
@@ -48,8 +55,15 @@ export default function ResetPassword({ resetPasswordToken, alert }) {
               required
               value={form.data.password_confirmation}
               onChange={(e) => form.setData('password_confirmation', e.target.value)}
+              aria-invalid={errors.password_confirmation ? 'true' : undefined}
+              aria-describedby={errors.password_confirmation ? 'password-confirmation-error' : undefined}
               className="w-full border border-blue/20 bg-white px-3 py-3 text-[15px] outline-none focus:border-orange"
             />
+            {errors.password_confirmation && (
+              <p id="password-confirmation-error" role="alert" className="mt-1 text-sm text-orange-ink">
+                {Array.isArray(errors.password_confirmation) ? errors.password_confirmation[0] : errors.password_confirmation}
+              </p>
+            )}
           </div>
 
           <button

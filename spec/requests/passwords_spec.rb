@@ -56,4 +56,27 @@ RSpec.describe "Passwords", type: :request do
 
     expect(user.reload.valid_password?("newpassword123")).to be(true)
   end
+
+  it "renders safe validation errors when password confirmation does not match" do
+    original_encrypted_password = user.encrypted_password
+    token = user.send_reset_password_instructions
+
+    put "/users/password", params: {
+      user: {
+        reset_password_token: token,
+        password: "newpassword123",
+        password_confirmation: "differentpassword123"
+      }
+    }
+
+    expect(response).to have_http_status(:unprocessable_content)
+    page = JSON.parse(Nokogiri::HTML(response.body).at_css("script[data-page]").text)
+    expect(page.fetch("component")).to eq("ResetPassword")
+    expect(page.dig("props", "resetPasswordToken")).to eq(token)
+    expect(page.dig("props", "errors")).to eq(
+      "password_confirmation" => [ "Las contraseñas no coinciden." ]
+    )
+    expect(response.body).not_to include("newpassword123", "differentpassword123")
+    expect(user.reload.encrypted_password).to eq(original_encrypted_password)
+  end
 end

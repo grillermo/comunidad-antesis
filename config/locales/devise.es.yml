@@ -14,3 +14,4 @@ es:
       already_confirmed: "ya fue confirmada"
       not_found: "no encontrado"
       taken: "ya está en uso"
+      confirmation: "Las contraseñas no coinciden."

@@ -15,4 +15,16 @@ class Users::PasswordsController < Devise::PasswordsController
       alert: flash[:alert]
     }
   end
+
+  def update
+    super do |resource|
+      next if resource.errors.empty?
+
+      render inertia: "ResetPassword", props: {
+        resetPasswordToken: resource.reset_password_token,
+        errors: resource.errors.to_hash
+      }, status: :unprocessable_content
+      return
+    end
+  end
 end
