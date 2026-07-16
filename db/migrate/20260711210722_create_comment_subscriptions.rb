@@ -6,6 +6,6 @@ class CreateCommentSubscriptions < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :comment_subscriptions, [:user_id, :comment_id], unique: true
+    add_index :comment_subscriptions, [ :user_id, :comment_id ], unique: true
   end
 end

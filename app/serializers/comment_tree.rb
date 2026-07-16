@@ -30,7 +30,7 @@ class CommentTree
   end
 
   def sort_roots(nodes)
-    nodes.sort_by { |comment| [comment.sticky? ? 0 : 1, -comment.hearts_count, -comment.created_at.to_f] }
+    nodes.sort_by { |comment| [ comment.sticky? ? 0 : 1, -comment.hearts_count, -comment.created_at.to_f ] }
   end
 
   def node(comment)

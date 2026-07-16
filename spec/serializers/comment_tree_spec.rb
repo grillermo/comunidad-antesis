@@ -16,9 +16,9 @@ RSpec.describe CommentTree do
 
     tree = described_class.new(section_path: section, current_user: viewer).as_json
 
-    expect(tree.map { |node| node[:id] }).to eq([pinned.id, high.id, low.id])
+    expect(tree.map { |node| node[:id] }).to eq([ pinned.id, high.id, low.id ])
     low_node = tree.find { |node| node[:id] == low.id }
-    expect(low_node[:replies].map { |node| node[:id] }).to eq([reply_a.id, reply_b.id])
+    expect(low_node[:replies].map { |node| node[:id] }).to eq([ reply_a.id, reply_b.id ])
   end
 
   it "exposes permission flags and heart state per viewer" do

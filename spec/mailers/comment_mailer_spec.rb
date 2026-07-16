@@ -20,7 +20,7 @@ RSpec.describe CommentMailer, type: :mailer do
     reply = create(:comment, section_path: section, user: author, body: "resp", parent: parent)
     mail = described_class.reply_notification(reply, subscriber)
 
-    expect(mail.to).to eq(["sub@example.com"])
+    expect(mail.to).to eq([ "sub@example.com" ])
     expect(mail.body.encoded).to include("resp")
   end
 end

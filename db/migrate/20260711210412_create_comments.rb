@@ -13,7 +13,7 @@ class CreateComments < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :comments, [:section_path, :ancestry]
+    add_index :comments, [ :section_path, :ancestry ]
     add_index :comments, :ancestry
   end
 end
