@@ -38,5 +38,9 @@ RSpec.describe "Landing", type: :request do
       JSON.parse(Manual::TABLE_OF_CONTENTS.to_json)
     )
     expect(inertia_page.dig("props", "manualPath")).to eq("/manual-del-color-vivo")
+
+    csrf_token = inertia_page.dig("props", "csrfToken")
+    expect(csrf_token).to be_a(String)
+    expect(csrf_token).to be_present
   end
 end

@@ -3,6 +3,7 @@ class LandingController < InertiaController
     if SalesLaunch.live?
       render inertia: "LandingSale", props: {
         contents: Manual::TABLE_OF_CONTENTS,
+        csrfToken: form_authenticity_token,
         manualPath: Manual.url_for(Current.user&.last_manual_path) || manual_path
       }
     else

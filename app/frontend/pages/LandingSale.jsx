@@ -4,12 +4,10 @@ import Recipe from '../components/manual/Recipe'
 import SideNote from '../components/manual/SideNote'
 import Steps from '../components/manual/Steps'
 
-function BuyButton({ className = '' }) {
-  const csrf = document.querySelector('meta[name="csrf-token"]')?.content
-
+function BuyButton({ csrfToken, className = '' }) {
   return (
     <form method="post" action="/checkout" className={className}>
-      <input type="hidden" name="authenticity_token" value={csrf} />
+      <input type="hidden" name="authenticity_token" value={csrfToken} />
       <button
         type="submit"
         className="font-display w-full bg-orange px-6 py-4 text-lg font-semibold text-white transition hover:bg-orange-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange sm:w-auto"
@@ -110,7 +108,7 @@ function RecipePreview() {
   )
 }
 
-export default function LandingSale({ user, contents, manualPath }) {
+export default function LandingSale({ user, contents, manualPath, csrfToken }) {
   return (
     <main className="min-h-screen overflow-hidden bg-cream font-body text-blue-ink">
       <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 sm:px-8 lg:px-10">
@@ -162,7 +160,7 @@ export default function LandingSale({ user, contents, manualPath }) {
             </p>
           </div>
           <div className="mt-8">
-            {user ? <ReaderButton manualPath={manualPath} /> : <BuyButton />}
+            {user ? <ReaderButton manualPath={manualPath} /> : <BuyButton csrfToken={csrfToken} />}
           </div>
           <p className="mt-4 text-sm text-blue-ink/65">PDF personalizado y acceso inmediato a la edición web.</p>
         </div>
@@ -210,7 +208,11 @@ export default function LandingSale({ user, contents, manualPath }) {
             Una guía para experimentar, observar y crear con los colores que ya viven a tu alrededor.
           </p>
           <div className="mt-8">
-            {user ? <ReaderButton manualPath={manualPath} /> : <BuyButton className="flex justify-center" />}
+            {user ? (
+              <ReaderButton manualPath={manualPath} />
+            ) : (
+              <BuyButton csrfToken={csrfToken} className="flex justify-center" />
+            )}
           </div>
         </div>
       </section>
