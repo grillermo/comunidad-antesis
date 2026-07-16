@@ -4,22 +4,43 @@
 # share Purchase.record!, so either arrival order produces one purchase.
 class GraciasController < InertiaController
   def show
-    return redirect_to(root_path) if params[:session_id].blank?
+    if params.key?(:session_id)
+      confirm_purchase
+    else
+      render_confirmation
+    end
+  rescue Stripe::InvalidRequestError
+    redirect_to root_path
+  end
 
-    session = Stripe::Checkout::Session.retrieve(params[:session_id])
-    return redirect_to(root_path) unless Purchase.fulfillable_session?(session)
+  private
 
-    purchase = Purchase.record!(session)
+  def confirm_purchase
+    stripe_session_id = params[:session_id]
+    return redirect_to(root_path) unless stripe_session_id.is_a?(String) && stripe_session_id.present?
+
+    checkout_session = Stripe::Checkout::Session.retrieve(stripe_session_id)
+    return redirect_to(root_path) unless Purchase.fulfillable_session?(checkout_session)
+
+    purchase = Purchase.record!(checkout_session)
     PurchaseFulfillmentJob.perform_later(purchase)
 
     sign_in(purchase.user) unless current_user == purchase.user
     Current.user = purchase.user
+    session[:gracias_purchase_id] = purchase.id
+
+    redirect_to gracias_por_tu_compra_path
+  end
+
+  def render_confirmation
+    return redirect_to(root_path) unless current_user && session[:gracias_purchase_id]
+
+    purchase = Purchase.find_by(id: session[:gracias_purchase_id], user_id: current_user.id)
+    return redirect_to(root_path) unless purchase
 
     render inertia: "GraciasPorTuCompra", props: {
       email: purchase.email,
       manualPath: manual_path
     }
-  rescue Stripe::InvalidRequestError
-    redirect_to root_path
   end
 end
