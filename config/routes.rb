@@ -37,6 +37,8 @@ Rails.application.routes.draw do
 
   resources :newsletter_emails, only: [:create]
 
+  post "/webhooks/stripe", to: "webhooks/stripe#create"
+
   get "/health", to: "health#show"
 
   # Reveal health status on /up for load balancers and uptime monitors.

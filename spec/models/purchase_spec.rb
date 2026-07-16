@@ -1,12 +1,42 @@
 require "rails_helper"
 
 RSpec.describe Purchase do
-  def checkout_session(id: "cs_test_123", email: "buyer@example.com")
+  def checkout_session(
+    id: "cs_test_123",
+    email: "buyer@example.com",
+    payment_status: "paid",
+    metadata: { product: "manual_del_color_vivo" }
+  )
     Stripe::Checkout::Session.construct_from(
       id: id,
-      payment_status: "paid",
+      payment_status: payment_status,
+      metadata: metadata,
       customer_details: { email: email }
     )
+  end
+
+  describe ".fulfillable_session?" do
+    it "accepts a paid session for the manual product" do
+      expect(described_class.fulfillable_session?(checkout_session)).to be(true)
+    end
+
+    it "rejects an unpaid session" do
+      session = checkout_session(payment_status: "unpaid")
+
+      expect(described_class.fulfillable_session?(session)).to be(false)
+    end
+
+    it "rejects a session without product metadata" do
+      session = checkout_session(metadata: {})
+
+      expect(described_class.fulfillable_session?(session)).to be(false)
+    end
+
+    it "rejects a session for another product" do
+      session = checkout_session(metadata: { product: "another_product" })
+
+      expect(described_class.fulfillable_session?(session)).to be(false)
+    end
   end
 
   describe ".record!" do

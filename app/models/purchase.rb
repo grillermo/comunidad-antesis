@@ -2,7 +2,13 @@
 # makes .record! idempotent across the webhook/redirect race and webhook
 # retries; fulfilled_at guards the one-shot fulfillment email.
 class Purchase < ApplicationRecord
+  MANUAL_PRODUCT = "manual_del_color_vivo"
+
   belongs_to :user, optional: true
+
+  def self.fulfillable_session?(session)
+    session.payment_status == "paid" && session.metadata&.[]("product") == MANUAL_PRODUCT
+  end
 
   # Shared entry point for the webhook and the gracias page. Deliberately NOT
   # wrapped in one transaction: on Postgres a unique-violation inside an open
