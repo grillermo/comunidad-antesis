@@ -44,3 +44,8 @@ No JS test runner or lint script is configured in `package.json` — frontend co
 **Admin access**: `RailsAdmin` engine mounted at `/antesis-admin`, gated by `authenticate :user, ->(user) { user.admin? }` in routes. `User#role` enum (`commenter`/`admin`), default `commenter`. Admin seeding is opt-in via `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars in `db/seeds.rb` (idempotent; raises if the email belongs to an existing non-admin).
 
 **Frontend**: Inertia pages live in `app/frontend/pages/`, most nested under `manual-del-color-vivo/` mirroring the slug tree. Shared manual chrome (title, "back to contents" link, next-page link, comment thread) lives in `ManualLayout.jsx`; reusable content primitives (recipes, callouts, material lists, steps, dividers) live in `app/frontend/components/manual/`. No SSR is wired into routes despite `app/frontend/ssr/ssr.jsx` existing.
+
+
+## About this site
+
+This is a site in spanish, but make sure all development work happens in english, all documentation. Only user facing string should be in spanish.
