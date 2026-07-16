@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe PurchaseFulfillmentJob do
   let(:purchase) { create(:purchase) }
+  let(:pdf) { "%PDF-1.4\n\x00\xFFstamped".b }
 
   # Test adapter so retry_on's re-enqueue is observable (test env default is
   # :solid_queue — see newsletter_mailerlite_enqueue_spec.rb).
@@ -14,10 +15,12 @@ RSpec.describe PurchaseFulfillmentJob do
 
   before do
     allow(ManualPdfStamper).to receive(:new)
-      .and_return(instance_double(ManualPdfStamper, call: "%PDF-1.4 fake"))
+      .and_return(instance_double(ManualPdfStamper, call: pdf))
   end
 
   it "stamps the PDF with the buyer's email, mails it, and marks fulfillment" do
+    expect(PurchaseMailer).to receive(:fulfillment).with(purchase, pdf).and_call_original
+
     expect {
       described_class.perform_now(purchase)
     }.to change { ActionMailer::Base.deliveries.count }.by(1)

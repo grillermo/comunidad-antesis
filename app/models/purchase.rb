@@ -10,11 +10,11 @@ class Purchase < ApplicationRecord
     session.payment_status == "paid" && session.metadata&.[]("product") == MANUAL_PRODUCT
   end
 
-  # Shared entry point for the webhook and the gracias page. Deliberately NOT
-  # wrapped in one transaction: on Postgres a unique-violation inside an open
-  # transaction poisons it, breaking create_or_find_by's rescue path. Each
-  # statement is individually atomic and a crash between them is repaired by
-  # the next call (user_id backfill below).
+  # Shared entry point for the webhook and the gracias page. create_or_find_by!
+  # isolates its insert in a requires_new transaction (a savepoint when
+  # nested), so Rails can recover from a uniqueness race safely. No outer
+  # transaction is required for correctness: if the process stops after the
+  # purchase commits but before user_id is linked, the next call repairs it.
   def self.record!(session)
     # Normalize to match Devise's strip_whitespace_keys and
     # case_insensitive_keys, so the rescue path can't miss an existing user.

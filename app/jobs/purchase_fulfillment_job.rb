@@ -1,7 +1,7 @@
-# Stamps the manual PDF with the buyer's email and mails it, exactly once per
-# purchase. Row lock + fulfilled_at guard make double-enqueues (webhook +
-# gracias page) and Stripe webhook retries harmless. deliver_now (not later)
-# so fulfilled_at is only set after the mail is actually handed off.
+# Stamps the manual PDF with the buyer's email and records fulfillment. The row
+# lock serializes duplicate enqueues, and fulfilled_at skips work once marked.
+# Mail handoff and the marker update are not atomic, so a crash between them can
+# resend. deliver_now ensures the marker is set only after mail handoff.
 class PurchaseFulfillmentJob < ApplicationJob
   queue_as :default
 
