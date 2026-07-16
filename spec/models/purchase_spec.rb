@@ -38,6 +38,16 @@ RSpec.describe Purchase do
       expect(User.count).to eq(1)
     end
 
+    it "normalizes the session email before reusing an existing user" do
+      existing = create(:user, email: "buyer@example.com")
+
+      purchase = described_class.record!(checkout_session(email: " Buyer@Example.com "))
+
+      expect(purchase.email).to eq("buyer@example.com")
+      expect(purchase.user).to eq(existing)
+      expect(User.count).to eq(1)
+    end
+
     it "backfills user_id if a previous call crashed before linking" do
       Purchase.create!(stripe_session_id: "cs_test_123", email: "buyer@example.com")
 

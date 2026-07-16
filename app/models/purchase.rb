@@ -10,9 +10,9 @@ class Purchase < ApplicationRecord
   # statement is individually atomic and a crash between them is repaired by
   # the next call (user_id backfill below).
   def self.record!(session)
-    # Downcase to match Devise's case_insensitive_keys normalization, so the
-    # rescue path's find_by! below can't miss an existing user row.
-    email = session.customer_details.email.downcase
+    # Normalize to match Devise's strip_whitespace_keys and
+    # case_insensitive_keys, so the rescue path can't miss an existing user.
+    email = session.customer_details.email.strip.downcase
 
     purchase = create_or_find_by!(stripe_session_id: session.id) do |p|
       p.email = email
