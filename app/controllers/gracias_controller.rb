@@ -25,22 +25,27 @@ class GraciasController < InertiaController
     purchase = Purchase.record!(checkout_session)
     PurchaseFulfillmentJob.perform_later(purchase)
 
-    sign_in(purchase.user) unless current_user == purchase.user
-    Current.user = purchase.user
+    if current_user.nil? && purchase.auto_login_on_return?
+      sign_in(purchase.user)
+      Current.user = purchase.user
+    end
     session[:gracias_purchase_id] = purchase.id
 
     redirect_to gracias_por_tu_compra_path
   end
 
   def render_confirmation
-    return redirect_to(root_path) unless current_user && session[:gracias_purchase_id]
+    return redirect_to(root_path) unless session[:gracias_purchase_id]
 
-    purchase = Purchase.find_by(id: session[:gracias_purchase_id], user_id: current_user.id)
+    purchase = Purchase.find_by(id: session[:gracias_purchase_id])
     return redirect_to(root_path) unless purchase
 
-    render inertia: "GraciasPorTuCompra", props: {
-      email: purchase.email,
-      manualPath: manual_path
-    }
+    props = if current_user == purchase.user
+      { email: purchase.email, manualPath: manual_path }
+    else
+      {}
+    end
+
+    render inertia: "GraciasPorTuCompra", props: props
   end
 end

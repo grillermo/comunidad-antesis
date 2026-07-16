@@ -48,6 +48,7 @@ RSpec.describe Purchase do
       expect(purchase.email).to eq("buyer@example.com")
       expect(purchase.user).to be_persisted
       expect(purchase.user.email).to eq("buyer@example.com")
+      expect(purchase.auto_login_on_return).to be(true)
     end
 
     it "is idempotent for the same session id" do
@@ -55,6 +56,7 @@ RSpec.describe Purchase do
       second = described_class.record!(checkout_session)
 
       expect(second.id).to eq(first.id)
+      expect(second.auto_login_on_return).to be(true)
       expect(Purchase.count).to eq(1)
       expect(User.where(email: "buyer@example.com").count).to eq(1)
     end
@@ -65,7 +67,18 @@ RSpec.describe Purchase do
       purchase = described_class.record!(checkout_session)
 
       expect(purchase.user).to eq(existing)
+      expect(purchase.auto_login_on_return).to be(false)
       expect(User.count).to eq(1)
+    end
+
+    it "never enables return auto-login for an existing admin" do
+      existing = create(:user, :admin, email: "buyer@example.com")
+
+      purchase = described_class.record!(checkout_session)
+
+      expect(purchase.user).to eq(existing)
+      expect(purchase.auto_login_on_return).to be(false)
+      expect(existing).to be_admin
     end
 
     it "normalizes the session email before reusing an existing user" do
@@ -75,6 +88,7 @@ RSpec.describe Purchase do
 
       expect(purchase.email).to eq("buyer@example.com")
       expect(purchase.user).to eq(existing)
+      expect(purchase.auto_login_on_return).to be(false)
       expect(User.count).to eq(1)
     end
 
@@ -84,6 +98,42 @@ RSpec.describe Purchase do
       purchase = described_class.record!(checkout_session)
 
       expect(purchase.user).to be_present
+      expect(purchase.auto_login_on_return).to be(false)
+    end
+
+    it "enables return auto-login only for the purchase that creates the user" do
+      first = described_class.record!(checkout_session(id: "cs_test_first"))
+      second = described_class.record!(checkout_session(id: "cs_test_second"))
+
+      expect(first.user).to eq(second.user)
+      expect(first.auto_login_on_return).to be(true)
+      expect(second.auto_login_on_return).to be(false)
+      expect(User.where(email: "buyer@example.com").count).to eq(1)
+    end
+
+    it "keeps return auto-login disabled when another purchase wins the user insert race" do
+      winning_user = create(:user, email: "buyer@example.com")
+      allow(User).to receive(:find_by).and_call_original
+      allow(User).to receive(:find_by).with(email: "buyer@example.com").and_return(nil)
+      allow(User).to receive(:create!).and_raise(ActiveRecord::RecordNotUnique, "race lost")
+
+      purchase = described_class.record!(checkout_session)
+
+      expect(purchase.user).to eq(winning_user)
+      expect(purchase.auto_login_on_return).to be(false)
+      expect(User.where(email: "buyer@example.com").count).to eq(1)
+    end
+
+    it "does not swallow unrelated user validation failures" do
+      invalid_user = User.new(email: "buyer@example.com")
+      invalid_user.errors.add(:password, :blank)
+      validation_error = ActiveRecord::RecordInvalid.new(invalid_user)
+      allow(User).to receive(:find_by).with(email: "buyer@example.com").and_return(nil)
+      allow(User).to receive(:create!).and_raise(validation_error)
+
+      expect {
+        described_class.record!(checkout_session)
+      }.to raise_error(validation_error)
     end
 
     it "created users are commenters with an unguessable password" do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_16_012428) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_16_020000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_16_012428) do
     t.datetime "fulfilled_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "auto_login_on_return", default: false, null: false
     t.index ["stripe_session_id"], name: "index_purchases_on_stripe_session_id", unique: true
     t.index ["user_id"], name: "index_purchases_on_user_id"
   end

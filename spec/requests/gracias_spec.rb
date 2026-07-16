@@ -46,6 +46,11 @@ RSpec.describe "Gracias por tu compra", type: :request do
     purchase
   end
 
+  def expect_generic_confirmation
+    expect(inertia_page.fetch("component")).to eq("GraciasPorTuCompra")
+    expect(inertia_page.fetch("props")).not_to include("email", "manualPath")
+  end
+
   def expect_rejected_session(session)
     allow(Stripe::Checkout::Session).to receive(:retrieve)
       .with("cs_test_123").and_return(session)
@@ -104,6 +109,40 @@ RSpec.describe "Gracias por tu compra", type: :request do
     expect(request.env.fetch("warden").user(:user)).to eq(existing_purchase.user)
   end
 
+  [ "commenter", "admin" ].each do |role|
+    it "does not authenticate a signed-out browser as an existing #{role}" do
+      existing = create(:user, email: "buyer@example.com", role: role)
+      allow(Stripe::Checkout::Session).to receive(:retrieve)
+        .with("cs_test_123").and_return(checkout_session)
+
+      get "/gracias-por-tu-compra", params: { session_id: "cs_test_123" }
+
+      purchase = follow_clean_confirmation_redirect
+
+      expect(purchase.user).to eq(existing)
+      expect(purchase.auto_login_on_return).to be(false)
+      expect(request.env.fetch("warden")).not_to be_authenticated(:user)
+      expect_generic_confirmation
+    end
+  end
+
+  it "retains owner access when the matching existing user is already signed in" do
+    existing = create(:user, email: "buyer@example.com")
+    sign_in existing
+    allow(Stripe::Checkout::Session).to receive(:retrieve)
+      .with("cs_test_123").and_return(checkout_session)
+
+    get "/gracias-por-tu-compra", params: { session_id: "cs_test_123" }
+
+    purchase = follow_clean_confirmation_redirect
+
+    expect(purchase.user).to eq(existing)
+    expect(purchase.auto_login_on_return).to be(false)
+    expect(request.env.fetch("warden").user(:user)).to eq(existing)
+    expect(inertia_page.dig("props", "email")).to eq("buyer@example.com")
+    expect(inertia_page.dig("props", "manualPath")).to eq("/manual-del-color-vivo")
+  end
+
   it "redirects a clean direct request without confirmation state" do
     allow(Stripe::Checkout::Session).to receive(:retrieve)
 
@@ -117,7 +156,7 @@ RSpec.describe "Gracias por tu compra", type: :request do
     expect(request.env.fetch("warden")).not_to be_authenticated(:user)
   end
 
-  it "does not render confirmation state for a different signed-in user" do
+  it "renders only generic confirmation state for a different signed-in user" do
     allow(Stripe::Checkout::Session).to receive(:retrieve)
       .with("cs_test_123").and_return(checkout_session)
     get "/gracias-por-tu-compra", params: { session_id: "cs_test_123" }
@@ -128,9 +167,10 @@ RSpec.describe "Gracias por tu compra", type: :request do
     sign_in other_user
     get "/gracias-por-tu-compra"
 
-    expect(response).to redirect_to(root_path)
+    expect(response).to have_http_status(:ok)
     expect(request.env.fetch("warden").user(:user)).to eq(other_user)
     expect(other_user).not_to eq(buyer)
+    expect_generic_confirmation
   end
 
   it "redirects without side effects when Stripe rejects the session id" do
@@ -178,7 +218,7 @@ RSpec.describe "Gracias por tu compra", type: :request do
     end
   end
 
-  it "switches an existing different login to the purchase owner" do
+  it "never switches an existing different login to the purchase owner" do
     other_user = create(:user, email: "other@example.com")
     sign_in other_user
     allow(Stripe::Checkout::Session).to receive(:retrieve)
@@ -189,12 +229,12 @@ RSpec.describe "Gracias por tu compra", type: :request do
     buyer = Purchase.last.user
     expect(response).to redirect_to(gracias_por_tu_compra_path)
     expect(buyer).not_to eq(other_user)
-    expect(request.env.fetch("warden").user(:user)).to eq(buyer)
+    expect(request.env.fetch("warden").user(:user)).to eq(other_user)
 
     follow_redirect!
 
     expect(response).to have_http_status(:ok)
-    expect(inertia_page.dig("props", "user", "email")).to eq("buyer@example.com")
-    expect(inertia_page.dig("props", "email")).to eq("buyer@example.com")
+    expect(inertia_page.dig("props", "user", "email")).to eq("other@example.com")
+    expect_generic_confirmation
   end
 end
