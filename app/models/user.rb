@@ -6,4 +6,5 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :hearts, dependent: :destroy
   has_many :comment_subscriptions, dependent: :destroy
+  has_many :purchases, dependent: :nullify
 end
