@@ -64,6 +64,7 @@ gem "vite_rails", "~> 3.11"
 gem "http", "~> 6.0"
 
 gem "devise", "~> 5.0"
+gem "stripe"
 
 gem "ancestry", "~> 4.3"
 gem "commonmarker", "~> 1.1"
