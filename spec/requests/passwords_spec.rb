@@ -3,6 +3,9 @@ require "rails_helper"
 RSpec.describe "Passwords", type: :request do
   let(:user) { create(:user) }
 
+  before { Rails.cache.clear }
+  after { Rails.cache.clear }
+
   it "renders the forgot-password Inertia page" do
     get "/users/password/new"
 
@@ -30,6 +33,81 @@ RSpec.describe "Passwords", type: :request do
 
     expect(response).to redirect_to("/users/sign_in")
     expect(request.flash[:notice]).to eq(known_email_notice)
+  end
+
+  it "allows reset requests below both limits to retain paranoid behavior" do
+    known_notice = nil
+
+    2.times do
+      post "/users/password", params: { user: { email: user.email } }
+      known_notice = request.flash[:notice]
+      expect(response).to redirect_to("/users/sign_in")
+    end
+
+    post "/users/password", params: { user: { email: "unknown@example.com" } }
+
+    expect(response).to redirect_to("/users/sign_in")
+    expect(request.flash[:notice]).to eq(known_notice)
+  end
+
+  it "rate limits the sixth reset request for the same normalized email across IPs" do
+    submitted_emails = [
+      " Person@Example.com ",
+      "PERSON@example.com",
+      "person@EXAMPLE.com",
+      " person@example.com",
+      "person@example.com ",
+      "person@example.com"
+    ]
+
+    submitted_emails.first(5).each_with_index do |email, index|
+      post "/users/password",
+        params: { user: { email: email } },
+        headers: { "REMOTE_ADDR" => "203.0.113.#{index + 1}" }
+
+      expect(response).to redirect_to("/users/sign_in")
+    end
+
+    post "/users/password",
+      params: { user: { email: submitted_emails.last } },
+      headers: { "REMOTE_ADDR" => "203.0.113.6" }
+
+    expect(response).to have_http_status(:too_many_requests)
+  end
+
+  it "rate limits the eleventh reset request from one IP across distinct emails" do
+    remote_ip = "203.0.113.20"
+
+    10.times do |attempt|
+      post "/users/password",
+        params: { user: { email: "person#{attempt}@example.com" } },
+        headers: { "REMOTE_ADDR" => remote_ip }
+
+      expect(response).to redirect_to("/users/sign_in")
+    end
+
+    post "/users/password",
+      params: { user: { email: "person10@example.com" } },
+      headers: { "REMOTE_ADDR" => remote_ip }
+
+    expect(response).to have_http_status(:too_many_requests)
+  end
+
+  {
+    "missing parameters" => {},
+    "a scalar user" => { user: "malformed" },
+    "an array user" => { user: [ "malformed" ] },
+    "a nested email" => { user: { email: { value: "person@example.com" } } },
+    "an array email" => { user: { email: [ "person@example.com" ] } }
+  }.each do |description, submitted_params|
+    it "rejects #{description} without sending reset email" do
+      expect {
+        post "/users/password", params: submitted_params
+      }.not_to change { ActionMailer::Base.deliveries.count }
+
+      expect(response).to have_http_status(:bad_request)
+      expect(response.body).to be_empty
+    end
   end
 
   it "renders the reset form for a valid token" do

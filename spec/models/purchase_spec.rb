@@ -128,6 +128,22 @@ RSpec.describe Purchase do
       invalid_user = User.new(email: "buyer@example.com")
       invalid_user.errors.add(:password, :blank)
       validation_error = ActiveRecord::RecordInvalid.new(invalid_user)
+      allow(User).to receive(:find_by).and_call_original
+      allow(User).to receive(:find_by).with(email: "buyer@example.com").and_return(nil)
+      allow(User).to receive(:create!).and_raise(validation_error)
+
+      expect {
+        described_class.record!(checkout_session)
+      }.to raise_error(validation_error)
+    end
+
+    it "does not swallow unrelated failures combined with an email race" do
+      create(:user, email: "buyer@example.com")
+      invalid_user = User.new(email: "buyer@example.com")
+      invalid_user.errors.add(:email, :taken)
+      invalid_user.errors.add(:password, :blank)
+      validation_error = ActiveRecord::RecordInvalid.new(invalid_user)
+      allow(User).to receive(:find_by).and_call_original
       allow(User).to receive(:find_by).with(email: "buyer@example.com").and_return(nil)
       allow(User).to receive(:create!).and_raise(validation_error)
 

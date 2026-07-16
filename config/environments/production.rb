@@ -59,7 +59,10 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: ENV.fetch("MAILGUN_DOMAIN") }
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("APP_HOST"),
+    protocol: "https"
+  }
 
   # Deliver via Mailgun's API (mailgun-ruby's Railgun adapter).
   config.action_mailer.delivery_method = :mailgun

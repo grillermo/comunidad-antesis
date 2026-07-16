@@ -12,10 +12,9 @@ class Purchase < ApplicationRecord
 
   # Shared entry point for the webhook and the gracias page. create_or_find_by!
   # isolates its insert in a requires_new transaction (a savepoint when
-  # nested), so Rails can recover from a uniqueness race safely. No outer
-  # transaction is required for correctness: if the process stops after the
-  # purchase commits but before user_id is linked, the next call repairs it.
-  # The purchase row lock serializes that repair and its auto-login decision.
+  # nested), so Rails can recover from a purchase uniqueness race safely. If
+  # the process stops before user_id is linked, the next call repairs it. The
+  # purchase row lock serializes that repair and its auto-login decision.
   def self.record!(session)
     # Normalize to match Devise's strip_whitespace_keys and
     # case_insensitive_keys, so the rescue path can't miss an existing user.
@@ -47,7 +46,10 @@ class Purchase < ApplicationRecord
           auto_login_on_return: false
         )
       rescue ActiveRecord::RecordInvalid => error
-        raise unless error.record.errors.added?(:email, :taken)
+        details = error.record.errors.details
+        email_race = details.keys == [ :email ] &&
+          details.fetch(:email).all? { |detail| detail[:error] == :taken }
+        raise unless email_race
 
         purchase.update!(
           user: User.find_by!(email: purchase.email),

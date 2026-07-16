@@ -25,6 +25,10 @@ bin/brakeman                         # security static analysis
 curl http://localhost:${RAILS_PORT:-3000}/health   # health check
 ```
 
+Production requires `APP_HOST` for canonical HTTPS application links in email.
+`MAILGUN_DOMAIN` is only the Mailgun sending domain; it must not be used as the
+application host.
+
 No JS test runner or lint script is configured in `package.json` — frontend correctness is covered by RSpec request specs plus manual verification.
 
 ## Architecture
@@ -43,7 +47,7 @@ No JS test runner or lint script is configured in `package.json` — frontend co
 
 **Admin access**: `RailsAdmin` engine mounted at `/antesis-admin`, gated by `authenticate :user, ->(user) { user.admin? }` in routes. `User#role` enum (`commenter`/`admin`), default `commenter`. Admin seeding is opt-in via `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars in `db/seeds.rb` (idempotent; raises if the email belongs to an existing non-admin).
 
-**Manual sales**: `SalesLaunch` switches the sales landing and `POST /checkout` on at the hardcoded launch date; Checkout creates a one-time Stripe Checkout Session, and the browser return through `/gracias-por-tu-compra` confirms the paid manual session before signing in the buyer. The signature-verified `POST /webhooks/stripe` endpoint accepts both immediate `checkout.session.completed` and delayed `checkout.session.async_payment_succeeded` events only when payment is paid and metadata identifies the manual. Both paths converge on `Purchase.record!`, whose unique Checkout Session key makes recording idempotent, then enqueue `PurchaseFulfillmentJob`, whose row lock and `fulfilled_at` marker serialize duplicate work while it stamps and emails the PDF. Buyer accounts use Devise `:recoverable` for permanent access; fulfillment emails also include a two-day, purpose-scoped signed `/acceso` login token.
+**Manual sales**: `SalesLaunch` switches the sales landing and `POST /checkout` on at the hardcoded launch date; Checkout creates a one-time Stripe Checkout Session, and the browser return through `/gracias-por-tu-compra` confirms the paid manual session. The signature-verified `POST /webhooks/stripe` endpoint accepts both immediate `checkout.session.completed` and delayed `checkout.session.async_payment_succeeded` events only when payment is paid and metadata identifies the manual. Both paths converge on `Purchase.record!`, whose unique Checkout Session key makes recording idempotent. Under the purchase row lock, only a purchase that safely creates its own new user receives `auto_login_on_return`; Checkout email never signs a browser into an existing account or replaces an active identity. Both request paths enqueue `PurchaseFulfillmentJob`, whose row lock and `fulfilled_at` marker serialize duplicate work while it stamps and emails the PDF. Buyer accounts use Devise `:recoverable` for permanent access; fulfillment emails also include a two-day, purpose-scoped signed `/acceso` login token. Production access links use `https://APP_HOST`; the Mailgun domain remains provider-only.
 
 **Frontend**: Inertia pages live in `app/frontend/pages/`, most nested under `manual-del-color-vivo/` mirroring the slug tree. Shared manual chrome (title, "back to contents" link, next-page link, comment thread) lives in `ManualLayout.jsx`; reusable content primitives (recipes, callouts, material lists, steps, dividers) live in `app/frontend/components/manual/`. Production uses the Vite/Inertia companion SSR service through `app/frontend/ssr/ssr.jsx`, so page render paths must not depend on browser globals such as `window` or `document`.
 
