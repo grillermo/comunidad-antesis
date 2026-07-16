@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
   devise_for :users,
     skip: [ :registrations ],
-    controllers: { sessions: "users/sessions" }
+    controllers: {
+      sessions: "users/sessions",
+      passwords: "users/passwords"
+    }
 
   authenticate :user, ->(user) { user.admin? } do
     mount RailsAdmin::Engine => "/antesis-admin", as: "rails_admin"

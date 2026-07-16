@@ -214,8 +214,7 @@ RSpec.describe "Sessions", type: :request do
     expect(response).not_to be_redirect
   end
 
-  it "has no self-registration or password-recovery routes" do
+  it "has no self-registration route" do
     expect(Rails.application.routes.url_helpers).not_to respond_to(:new_user_registration_path)
-    expect(Rails.application.routes.url_helpers).not_to respond_to(:new_user_password_path)
   end
 end

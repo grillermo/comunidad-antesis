@@ -61,6 +61,10 @@ export default function Login({ alert }) {
           >
             Entrar
           </button>
+
+          <a href="/users/password/new" className="text-sm text-blue underline">
+            ¿Olvidaste tu contraseña?
+          </a>
         </form>
       </div>
     </main>
