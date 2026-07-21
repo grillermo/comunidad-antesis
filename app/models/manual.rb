@@ -41,7 +41,7 @@ module Manual
           { title: "Receta de pretratamiento con taninos", slug: "receta-de-pretratamiento-con-taninos", children: [] }
         ] },
         { title: "Sulfato ferroso", slug: "sulfato-ferroso", children: [
-          { title: "Receta de baño modificador con sulfato ferroso", slug: "receta-de-bano-modificador-con-sulfato-ferroso", children: [] }
+          { title: "Receta de baño oscurecedor con sulfato ferroso", slug: "receta-de-bano-oscurecedor-con-sulfato-ferroso", children: [] }
         ] },
         { title: "Dibujos con sulfato ferroso", slug: "dibujos-con-sulfato-ferroso", children: [] },
         { title: "Ácido cítrico", slug: "acido-citrico", children: [
