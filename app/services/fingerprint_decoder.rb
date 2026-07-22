@@ -17,6 +17,24 @@ class FingerprintDecoder
   TSX_BIN = Rails.root.join("node_modules/.bin/tsx")
   MAX_PDF_PAGES = 6 # first N content pages after the cover, enough redundancy
 
+  # This tool only ever needs to handle a manual-sized PDF or a single-page
+  # screenshot, both far smaller than this — a hard cap avoids reading an
+  # arbitrarily huge upload fully into memory (memory-exhaustion DoS).
+  MAX_UPLOAD_BYTES = 25.megabytes
+
+  # Dispatch is based on sniffing real file content, not attacker-controlled
+  # request metadata (content_type/filename).
+  MAGIC_BYTES = {
+    pdf: "%PDF",
+    png: "\x89PNG".b,
+    jpeg: "\xFF\xD8\xFF".b
+  }.freeze
+
+  # Resource limits passed to ImageMagick's `convert` to reduce blast radius
+  # from a crafted/hostile image (decompression bombs, ImageTragick-class
+  # issues): cap memory/map usage and wall-clock time.
+  CONVERT_RESOURCE_LIMITS = %w[-limit memory 256MiB -limit map 256MiB -limit time 30].freeze
+
   Result = Data.define(:user, :confidence, :purchase)
 
   def initialize(uploaded_file)
@@ -24,8 +42,11 @@ class FingerprintDecoder
   end
 
   def call
+    validate_size!
+    format = detect_format!
+
     Dir.mktmpdir("fingerprint-decode-") do |dir|
-      image_paths = rasterize(dir)
+      image_paths = format == :pdf ? rasterize_pdf(dir) : rasterize_image(dir)
       candidates = image_paths.filter_map { |path| decode_image(path) }
       best = candidates.max_by { |c| c[:confidence] }
       return nil unless best
@@ -39,13 +60,23 @@ class FingerprintDecoder
 
   private
 
-  def rasterize(dir)
-    pdf? ? rasterize_pdf(dir) : rasterize_image(dir)
+  def validate_size!
+    size = @uploaded_file.size
+    return if size && size <= MAX_UPLOAD_BYTES
+
+    raise Error, "Uploaded file is too large (max #{MAX_UPLOAD_BYTES / 1.megabyte} MB)"
   end
 
-  def pdf?
-    @uploaded_file.content_type == "application/pdf" ||
-      @uploaded_file.original_filename.to_s.downcase.end_with?(".pdf")
+  # Sniffs the first few bytes of the actual content to decide how to
+  # rasterize it, rather than trusting content_type/filename.
+  def detect_format!
+    header = @uploaded_file.read(8).to_s.b
+    @uploaded_file.rewind
+
+    return :pdf if header.start_with?(MAGIC_BYTES[:pdf])
+    return :image if header.start_with?(MAGIC_BYTES[:png]) || header.start_with?(MAGIC_BYTES[:jpeg])
+
+    raise Error, "Unrecognized file format: expected a PDF, PNG, or JPEG"
   end
 
   def rasterize_pdf(dir)
@@ -68,7 +99,7 @@ class FingerprintDecoder
     File.binwrite(source, @uploaded_file.read)
     target = File.join(dir, "page-1.png")
 
-    _stdout, stderr, status = Open3.capture3("convert", source, target)
+    _stdout, stderr, status = Open3.capture3("convert", *CONVERT_RESOURCE_LIMITS, source, target)
     raise Error, "ImageMagick convert failed: #{stderr}" unless status.success?
 
     [ target ]

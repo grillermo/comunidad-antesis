@@ -29,4 +29,41 @@ RSpec.describe FingerprintDecoder do
       expect(described_class.new(file).call).to be_nil
     end
   end
+
+  it "rejects an oversized upload before touching pdftoppm/convert" do
+    expect(Open3).not_to receive(:capture3)
+
+    Tempfile.create([ "upload", ".pdf" ], binmode: true) do |f|
+      f.write("%PDF-1.4\n")
+      f.truncate(described_class::MAX_UPLOAD_BYTES + 1)
+      f.rewind
+      file = ActionDispatch::Http::UploadedFile.new(tempfile: f, filename: "big.pdf", type: "application/pdf")
+
+      expect { described_class.new(file).call }.to raise_error(described_class::Error, /too large/)
+    end
+  end
+
+  it "rejects a file claiming to be a PDF whose content isn't actually a PDF" do
+    expect(Open3).not_to receive(:capture3)
+
+    Tempfile.create([ "upload", ".pdf" ], binmode: true) do |f|
+      f.write("plain text, not a real pdf")
+      f.rewind
+      file = ActionDispatch::Http::UploadedFile.new(tempfile: f, filename: "fake.pdf", type: "application/pdf")
+
+      expect { described_class.new(file).call }.to raise_error(described_class::Error, /Unrecognized file format/)
+    end
+  end
+
+  it "rejects a file claiming to be a PNG whose content isn't actually a PNG" do
+    expect(Open3).not_to receive(:capture3)
+
+    Tempfile.create([ "upload", ".png" ], binmode: true) do |f|
+      f.write("this is not actually a png")
+      f.rewind
+      file = ActionDispatch::Http::UploadedFile.new(tempfile: f, filename: "fake.png", type: "image/png")
+
+      expect { described_class.new(file).call }.to raise_error(described_class::Error, /Unrecognized file format/)
+    end
+  end
 end
