@@ -11,6 +11,7 @@ import {
   TextRenderingMode,
   rgb,
 } from "@cantoo/pdf-lib"
+import { buildFrame, cellFraction, pairColumns } from "./lib/watermark.ts"
 
 // Page 2 of data/manual.pdf: 396.85 x 612.283 pt, author name centered,
 // baseline ~57pt from bottom. Stamp goes directly below it.
@@ -41,6 +42,7 @@ type LinkTarget = { title: string; url: string }
 type TextItem = { top: number; left: number; width: number; height: number; text: string }
 type Box = { left: number; top: number; right: number; bottom: number }
 type Match = { pageNumber: number; box: Box; url: string }
+type StdinPayload = { targets: LinkTarget[]; fingerprintCode?: number }
 
 // Normalize heading text so PDF glyph runs and TOC titles compare equal:
 // decode entities, drop inline markup, fold whitespace, lowercase.
@@ -159,6 +161,37 @@ function readStdin(): Promise<string> {
   })
 }
 
+function embedWatermark(page: import("@cantoo/pdf-lib").PDFPage, code: number) {
+  const { width, height } = page.getSize()
+  const darkColor = rgb(0, 0, 0)
+  const lightColor = rgb(1, 1, 1)
+
+  for (const slot of buildFrame(code)) {
+    const { colA, colB } = pairColumns(slot.pairCol)
+    const a = cellFraction(colA, slot.row)
+    const b = cellFraction(colB, slot.row)
+    const [aColor, bColor] = slot.bit === 1 ? [darkColor, lightColor] : [lightColor, darkColor]
+
+    // cellFraction is top-down (row 0 = top); PDF points are bottom-up.
+    page.drawRectangle({
+      x: a.x * width,
+      y: (1 - a.y - a.height) * height,
+      width: a.width * width,
+      height: a.height * height,
+      color: aColor,
+      opacity: slot.amplitude,
+    })
+    page.drawRectangle({
+      x: b.x * width,
+      y: (1 - b.y - b.height) * height,
+      width: b.width * width,
+      height: b.height * height,
+      color: bColor,
+      opacity: slot.amplitude,
+    })
+  }
+}
+
 async function main() {
   const [sourcePath, email] = process.argv.slice(2)
   if (!sourcePath || !email) {
@@ -167,7 +200,8 @@ async function main() {
   }
 
   const raw = await readStdin()
-  const targets: LinkTarget[] = raw.trim() ? JSON.parse(raw) : []
+  const payload: StdinPayload = raw.trim() ? JSON.parse(raw) : { targets: [] }
+  const targets = payload.targets ?? []
   const titles = new Map<string, string>()
   for (const t of targets) titles.set(normalize(t.title), t.url)
 
@@ -220,7 +254,8 @@ async function main() {
     color: AUTHOR_BLUE,
   })
 
-  // Hidden per-page email watermark on every page after the first two.
+  // Hidden per-page email watermark + pixel fingerprint on every page after
+  // the first two.
   const allPages = doc.getPages()
   for (let i = STAMP_PAGE_INDEX + 1; i < allPages.length; i++) {
     allPages[i].drawText(text, {
@@ -230,6 +265,9 @@ async function main() {
       font,
       renderMode: TextRenderingMode.Invisible,
     })
+    if (payload.fingerprintCode) {
+      embedWatermark(allPages[i], payload.fingerprintCode)
+    }
   }
 
   process.stdout.write(await doc.save({ useObjectStreams: false }))
