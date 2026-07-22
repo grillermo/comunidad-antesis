@@ -7,6 +7,11 @@ Rails.application.routes.draw do
     }
 
   authenticate :user, ->(user) { user.admin? } do
+    get "/antesis-admin/fingerprint", to: "admin/fingerprints#new", as: :admin_fingerprint
+    post "/antesis-admin/fingerprint", to: "admin/fingerprints#create"
+  end
+
+  authenticate :user, ->(user) { user.admin? } do
     mount RailsAdmin::Engine => "/antesis-admin", as: "rails_admin"
   end
 
