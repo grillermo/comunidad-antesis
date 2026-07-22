@@ -86,9 +86,13 @@ RSpec.describe "fingerprint watermark", type: "integration" do
       _stdout, stderr, _status = Open3.capture3(
         "compare", "-metric", "AE", "-fuzz", "1%", stamped_path, unstamped_path, diff_path
       )
-      differing_pixels = stderr.to_s.strip.to_i
+      # ImageMagick switches AE's stderr output to scientific notation once
+      # the count is large (e.g. "1.05525e+06 (1)") -- String#to_i truncates
+      # that at the decimal point, silently collapsing a huge diff to 1. Parse
+      # as a float first so a real regression can't hide behind this quirk.
+      differing_pixels = stderr.to_s.strip.to_f
 
-      expect(differing_pixels.to_f / PAGE_PIXELS).to be < 0.01
+      expect(differing_pixels / PAGE_PIXELS).to be < 0.01
     end
   end
 
