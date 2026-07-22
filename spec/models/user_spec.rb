@@ -39,4 +39,20 @@ RSpec.describe User, type: :model do
     expect(user).to respond_to(:hearts)
     expect(user).to respond_to(:comment_subscriptions)
   end
+
+  describe "fingerprint_code" do
+    it "is assigned on create" do
+      user = User.create!(email: "reader@example.com", password: Devise.friendly_token)
+      expect(user.fingerprint_code).to be_a(Integer)
+      expect(user.fingerprint_code).to be_between(1, 2**32 - 1)
+    end
+
+    it "is unique" do
+      allow(SecureRandom).to receive(:random_number).with(2**32 - 1).and_return(41, 41, 42)
+      existing = User.create!(email: "first@example.com", password: Devise.friendly_token)
+      new_user = User.create!(email: "second@example.com", password: Devise.friendly_token)
+
+      expect(new_user.fingerprint_code).not_to eq(existing.fingerprint_code)
+    end
+  end
 end
