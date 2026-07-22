@@ -12,8 +12,8 @@ export const PAYLOAD_ROW_START = CAL_ROWS_TOP // 2
 export const PAYLOAD_ROW_END = ROWS - CAL_ROWS_BOTTOM // 22 (exclusive)
 export const PAYLOAD_BITS = 40 // 32-bit code + 8-bit CRC
 export const CONTENT_MARGIN_FRACTION = 0.04
-export const AMPLITUDE_PAYLOAD = 0.03
-export const AMPLITUDE_CALIBRATION = 0.05
+export const AMPLITUDE_PAYLOAD = 0.005
+export const AMPLITUDE_CALIBRATION = 0.008
 
 // Fixed pattern (not secret, not per-user) carried by the 4 calibration rows.
 // Used purely to detect sign inversion (e.g. a negative/inverted rescan).
